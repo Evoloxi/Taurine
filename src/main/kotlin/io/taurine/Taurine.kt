@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
 @Mod(Taurine.ID)
-@EventBusSubscriber(value = [Dist.CLIENT])
 object Taurine {
     const val ID = "taurine"
 

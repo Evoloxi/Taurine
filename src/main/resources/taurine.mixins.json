@@ -3,7 +3,8 @@
   "minVersion": "0.8",
   "package": "io.taurine.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
+  "plugin": "io.taurine.TaurineMixinPlugin",
+  "client": [
     "create.AllBlockEntityTypesMixin",
     "create.BasinBlockEntityMixin",
     "create.BeltRendererMixin",
@@ -14,14 +15,13 @@
     "create.FilteringRendererMixin",
     "create.LinkBehaviourMixin",
     "create.SawVisualMixin",
+    "create.DeployerVisualMixin",
     "create.accessor.BasinBlockEntityAccessor",
     "create.accessor.DepotBehaviourAccessor",
     "create.accessor.FilteringBehaviourAccessor",
     "create.accessor.LinkBehaviourAccessor",
     "minecraft.accessor.ItemStackAccessor",
     "vanillin.ItemModelsMixin"
-  ],
-  "client": [
   ],
   "injectors": {
     "defaultRequire": 1
