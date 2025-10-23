@@ -27,11 +27,11 @@ class LinkVisual<T : SmartBlockEntity>(
     override fun renderOnBlockEntity(ms: PoseStack) {
         if (be.isRemoved) return
 
-        val cameraEntity = Minecraft.getInstance().cameraEntity
+        /*val cameraEntity = Minecraft.getInstance().cameraEntity
         val max = AllConfigs.client().filterItemRenderDistance.f
         if (!be.isVirtual && cameraEntity != null && cameraEntity.position().distanceToSqr(
                 VecHelper.getCenterOf(be.blockPos)
-        ) > (max * max)) return
+        ) > (max * max)) return*/
 
         val behaviour = be.getBehaviour(LinkBehaviour.TYPE) ?: return
 
@@ -58,15 +58,5 @@ class LinkVisual<T : SmartBlockEntity>(
 
     init {
         update(delta)
-    }
-
-    override fun renderItem(ms: PoseStack, item: ItemStack) {
-        val key = ModelCache.hashItem(item, ItemDisplayContext.FIXED)
-        loadModel(item, key) ?: return
-        instances.get(key).apply {
-            setIdentityTransform()
-            setTransform(ms)
-            setChanged()
-        }
     }
 }

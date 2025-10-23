@@ -26,7 +26,6 @@ public abstract class DeployerVisualMixin extends AbstractVisual {
     @Inject(method = "<init>", at = @At("RETURN"))
     void init(VisualizationContext context, DeployerBlockEntity blockEntity, float partialTick, CallbackInfo ci) {
         taurine$filterVisual = new FilterVisual<>(context, blockEntity, partialTick);
-        taurine$filterVisual.update(partialTick); // why the fuck do I need to call this when it is FilterVisual's init
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Ldev/engine_room/flywheel/api/instance/Instancer;stealInstance(Ldev/engine_room/flywheel/api/instance/Instance;)V"))

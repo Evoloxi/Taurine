@@ -18,7 +18,6 @@ public class SawVisualMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     void init(VisualizationContext context, SawBlockEntity blockEntity, float partialTick, CallbackInfo ci) {
         taurine$filterVisual = new FilterVisual<>(context, blockEntity, partialTick);
-        taurine$filterVisual.update(partialTick); // why the fuck do I need to call this when it is FilterVisual's init
     }
 
     @Inject(method = "updateLight", at = @At("TAIL"))

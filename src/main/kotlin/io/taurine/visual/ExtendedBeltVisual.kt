@@ -6,7 +6,6 @@ import com.simibubi.create.content.kinetics.belt.*
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
 import com.simibubi.create.foundation.mixin.accessor.LevelRendererAccessor
-import dev.engine_room.flywheel.api.model.Model
 import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visual.LightUpdatedVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
@@ -14,12 +13,10 @@ import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
-import io.taurine.SmartPreservingRecycler
 import io.taurine.ModelCache
-import io.taurine.ModelCache.hashItem
 import io.taurine.PreservingInstanceRecycler
+import io.taurine.SmartPreservingRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
@@ -27,6 +24,8 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
+import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.AABB
@@ -40,27 +39,30 @@ class ExtendedBeltVisual(
     ctx, belt, partialTick
 ), SimpleDynamicVisual, LightUpdatedVisual {
 
-    private val instances = SmartPreservingRecycler<Int, TransformedInstance> {
-        updateModelsForItems(belt.inventory.transportedItems)
+    val instances = SmartPreservingRecycler<ItemStack, TransformedInstance> {
         instancerProvider().instancer(
-            InstanceTypes.TRANSFORMED, // TODO: custom type for uniform motion
-            hashToModel[it]!!
+            InstanceTypes.TRANSFORMED,
+            ItemModels.get(
+                level,
+                it,
+                ItemDisplayContext.FIXED
+            )
         ).createInstance()
     }
 
-    private val hashToModel = Int2ObjectOpenHashMap<Model>()
+/*    private val hashToModel = Int2ObjectOpenHashMap<Model>()
     private var modelKeys = hashToModel.keys
 
     fun updateModelsForItems(items: List<TransportedItemStack>) {
         for (item in items) {
             val hash = hashItem(item.stack)
-            if (!modelKeys.contains(hash) && ModelCache.isSupported(item.stack, hash)) {
-                val model = ModelCache.getModel(item.stack, belt.level!!, hash)!!
+            if (!modelKeys.contains(hash) && ModelCache.isSupported(item.stack)) {
+                val model = ModelCache.getModel(item.stack, ItemDisplayContext.FIXED)!! // TODO: context
                 hashToModel[hash] = model
             }
         }
         modelKeys = hashToModel.keys
-    }
+    }*/
 
     val shadows = PreservingInstanceRecycler {
         instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 1).createInstance()
@@ -105,7 +107,7 @@ class ExtendedBeltVisual(
         transported: TransportedItemStack,
         pPoseStack: PoseStack,
         random: RandomSource,
-        hash: Int
+        //hash: Int
     ) {
         val itemStack = transported.stack
         val bakedModel = ItemModels.getModel(itemStack)
@@ -253,7 +255,7 @@ class ExtendedBeltVisual(
 
             itemMatrix.scale(scaleValue, scaleValue, scaleValue)
 
-            instances.get(hash).apply {
+            instances.get(itemStack).apply {
                 setTransform(itemMatrix)
                 if (updateLight) light(stackLight)
                 setChanged()
@@ -275,7 +277,7 @@ class ExtendedBeltVisual(
     var dirty = true
     override fun update(pt: Float) {
         dirty = true
-        updateModelsForItems(belt.inventory.transportedItems)
+        //updateModelsForItems(belt.inventory.transportedItems)
         super.update(pt)
     }
 
@@ -299,11 +301,11 @@ class ExtendedBeltVisual(
         val verticality = if (slope == BeltSlope.DOWNWARD) -1 else if (slope == BeltSlope.UPWARD) 1 else 0
         pPoseStack.pushPose()
         for (stack in inv.transportedItems) {
-            val hash = hashItem(stack.stack)
-            if (ModelCache.isSupported(stack.stack, hash)) {
+            //val hash = hashItem(stack.stack)
+            if (ModelCache.isSupported(stack.stack)) {
                 if (!dirty && stack.beltPosition == stack.prevBeltPosition && stack.sideOffset == stack.prevSideOffset) { // TODO dynamic aka upright items
                     val count = Mth.log2(stack.stack.count) / 2 + 1
-                    instances.preserve(hash, count)
+                    instances.preserve(stack.stack, count)
                     shadows.preserve(1)
                     continue
                 }
@@ -320,7 +322,7 @@ class ExtendedBeltVisual(
                     stack,
                     pPoseStack,
                     RANDOM.get(),
-                    hash
+                    //hash
                 )
             }
         }

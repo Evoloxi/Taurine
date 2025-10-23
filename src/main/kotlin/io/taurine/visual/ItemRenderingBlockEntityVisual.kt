@@ -1,15 +1,14 @@
 package io.taurine.visual
 
+import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import dev.engine_room.flywheel.api.instance.Instance
-import dev.engine_room.flywheel.api.model.Model
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
+import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.SmartPreservingRecycler
-import io.taurine.ModelCache
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
@@ -21,23 +20,17 @@ abstract class ItemRenderingBlockEntityVisual<T : SmartBlockEntity>(
 ) : AbstractBlockEntityVisual<T>(
     visualizationContext, be, delta
 ) {
-    protected val hashToModel = Int2ObjectOpenHashMap<Model>()
     abstract val itemDisplayContext: ItemDisplayContext
 
-    val instances = SmartPreservingRecycler<Int, TransformedInstance> {
+    val instances = SmartPreservingRecycler<ItemStack, TransformedInstance> {
         instancerProvider().instancer(
             InstanceTypes.TRANSFORMED,
-            hashToModel[it]!!
+            ItemModels.get(
+                level,
+                it,
+                itemDisplayContext
+            )
         ).createInstance()
-    }
-
-    protected fun loadModel(item: ItemStack, hash: Int = ModelCache.hashItem(item, itemDisplayContext)): Model? {
-        return if (!hashToModel.containsKey(hash) && ModelCache.isSupported(item, hash)) {
-            val model = ModelCache.getModel(item, level, hash)
-            hashToModel.put(hash, model)
-        } else {
-            hashToModel[hash]
-        }
     }
 
     override fun _delete() {
@@ -51,6 +44,14 @@ abstract class ItemRenderingBlockEntityVisual<T : SmartBlockEntity>(
         )
         instances.applyToAll {
             light = packed
+            setChanged()
+        }
+    }
+
+    fun renderItem(ms: PoseStack, item: ItemStack) {
+        instances.get(item).apply {
+            setIdentityTransform()
+            setTransform(ms)
             setChanged()
         }
     }

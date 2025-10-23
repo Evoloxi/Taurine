@@ -9,7 +9,6 @@ import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.transform.TransformStack
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import io.taurine.ModelCache.hashItem
 import io.taurine.SmartPreservingRecycler
 import io.taurine.extension.inaccessible.ingredientRotation
 import io.taurine.extension.inaccessible.itemCapability
@@ -137,15 +136,6 @@ class BasinVisual(
         }
     }
 
-    fun renderItem(ms: PoseStack, item: ItemStack) {
-        val key = hashItem(item, itemDisplayContext)
-        loadModel(item, key) ?: return
-        instances.get(key).apply {
-            setIdentityTransform()
-            setTransform(ms)
-            setChanged()
-        }
-    }
     override fun update(partialTick: Float) {
         instances.resetCount()
         val ms = PoseStack().apply {

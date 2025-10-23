@@ -10,14 +10,9 @@ import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.model.Model
 import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
-import dev.engine_room.flywheel.lib.instance.InstanceTypes
-import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.transform.TransformStack
-import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import dev.engine_room.flywheel.lib.visual.util.SmartRecycler
 import io.taurine.ModelCache
-import io.taurine.ModelCache.hashItem
 import io.taurine.extension.inaccessible.depotBehaviour
 import io.taurine.extension.inaccessible.heldItem
 import io.taurine.extension.inaccessible.incoming
@@ -28,6 +23,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.Direction
 import net.minecraft.util.Mth
+import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.Vec3
@@ -35,18 +31,12 @@ import java.util.*
 import java.util.function.Consumer
 
 class DepotVisual(
-    visualizationContext: VisualizationContext, val be: DepotBlockEntity, delta: Float
-) : AbstractBlockEntityVisual<DepotBlockEntity>(
+    visualizationContext: VisualizationContext, be: DepotBlockEntity, delta: Float
+) : ItemRenderingBlockEntityVisual<DepotBlockEntity>(
     visualizationContext, be, delta
 ), SimpleDynamicVisual {
 
-    val instances = SmartRecycler<Int, TransformedInstance> {
-        instancerProvider().instancer(
-            InstanceTypes.TRANSFORMED,
-            hashToModel[it]!!
-        ).createInstance()
-    }
-
+    override val itemDisplayContext = ItemDisplayContext.FIXED
     val hashToModel = Int2ObjectOpenHashMap<Model>()
 
     inline fun forAllIncomingItems(action: (TransportedItemStack) -> Unit) {
@@ -129,8 +119,6 @@ class DepotVisual(
         val bakedModel = itemRenderer.getModel(stack, null, null, 0)
         val blockItem = bakedModel.isGui3d
         val renderUpright = BeltHelper.isItemUpright(stack)
-        val hash = hashItem(stack)
-        loadModel(stack, hash)
 
         ms.pushPose()
         msr.rotateYDegrees(angle)
@@ -161,7 +149,7 @@ class DepotVisual(
                 msr.rotateXDegrees(90f)
             }
 
-            instances.get(hash).apply {
+            instances.get(stack).apply {
                 setIdentityTransform()
                 setTransform(ms)
                 light = stackLight
@@ -178,16 +166,6 @@ class DepotVisual(
         }
 
         ms.popPose()
-    }
-
-    fun loadModel(item: ItemStack, hash: Int = hashItem(item)): Model? {
-        return if (!hashToModel.containsKey(hash) && ModelCache.isSupported(item)) {
-            val model = ModelCache.getModel(item, level, hash)!!
-            hashToModel[hash] = model
-            model
-        } else {
-            hashToModel[hash]
-        }
     }
 
     var dirty = false
@@ -225,7 +203,7 @@ class DepotVisual(
 
     override fun collectCrumblingInstances(consumer: Consumer<Instance?>) = Unit
 
-    override fun updateLight(delta: Float) {
-        animate(delta)
+    override fun updateLight(partialTick: Float) {
+        animate(partialTick)
     }
 }
