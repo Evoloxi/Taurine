@@ -1,7 +1,6 @@
-package io.architekton.flywheel
+package io.taurine
 
 import dev.engine_room.flywheel.api.instance.Instance
-import io.taurine.PreservingInstanceRecycler
 
 class SmartPreservingRecycler<K, I : Instance>(val factory: (K) -> I) {
     val recyclers: MutableMap<K, PreservingInstanceRecycler<I>> = mutableMapOf()

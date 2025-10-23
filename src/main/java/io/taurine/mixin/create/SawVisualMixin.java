@@ -3,7 +3,7 @@ package io.taurine.mixin.create;
 import com.simibubi.create.content.kinetics.saw.SawBlockEntity;
 import com.simibubi.create.content.kinetics.saw.SawVisual;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
-import io.taurine.visuals.FilterVisual;
+import io.taurine.visual.FilterVisual;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

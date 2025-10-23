@@ -15,6 +15,7 @@ object ModelCache {
     // TODO: consider com.google.common.collect.MapMaker#MapMaker.weakValues().makeMap() or RendererReloadCache!!!
     private val table: Int2ObjectOpenHashMap<Model> = Int2ObjectOpenHashMap()
 
+    @Deprecated("todo: replace with record")
     fun hashItem(stack: ItemStack, context: ItemDisplayContext = ItemDisplayContext.FIXED): Int {
         @Suppress("CAST_NEVER_SUCCEEDS")
         val itemId = BuiltInRegistries.ITEM.getId((stack as ItemStackAccessor).nullableItem)

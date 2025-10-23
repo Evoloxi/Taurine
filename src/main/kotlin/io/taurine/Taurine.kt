@@ -1,5 +1,6 @@
 package io.taurine
 
+import net.minecraft.resources.ResourceLocation
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -23,5 +24,9 @@ object Taurine {
     @SubscribeEvent
     fun onCommonSetup(event: FMLCommonSetupEvent) {
         LOGGER.log(Level.INFO, "Taurine/setup")
+    }
+
+    operator fun invoke(path: String): ResourceLocation {
+        return ResourceLocation.fromNamespaceAndPath(ID, path)
     }
 }
