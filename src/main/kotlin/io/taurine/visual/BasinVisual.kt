@@ -1,26 +1,16 @@
 package io.taurine.visual
 
 import com.mojang.blaze3d.vertex.PoseStack
-import com.simibubi.create.Create
 import com.simibubi.create.content.fluids.FluidMesh
 import com.simibubi.create.content.processing.basin.BasinBlock
 import com.simibubi.create.content.processing.basin.BasinBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour
-import dev.engine_room.flywheel.api.instance.InstanceHandle
-import dev.engine_room.flywheel.api.instance.InstanceType
-import dev.engine_room.flywheel.api.layout.FloatRepr
-import dev.engine_room.flywheel.api.layout.IntegerRepr
-import dev.engine_room.flywheel.api.layout.LayoutBuilder
 import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
-import dev.engine_room.flywheel.lib.instance.SimpleInstanceType
-import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.transform.TransformStack
-import dev.engine_room.flywheel.lib.util.ExtraMemoryOps
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import io.taurine.ModelCache.hashItem
 import io.taurine.SmartPreservingRecycler
-import io.taurine.Taurine
 import io.taurine.extension.inaccessible.ingredientRotation
 import io.taurine.extension.inaccessible.itemCapability
 import io.taurine.extension.inaccessible.visualizedOutputItems
@@ -44,48 +34,7 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
 import net.neoforged.neoforge.items.IItemHandlerModifiable
 import net.neoforged.neoforge.items.ItemStackHandler
-import org.lwjgl.system.MemoryUtil
 import kotlin.math.max
-
-class ScalingFluidInstance(type: InstanceType<out TransformedInstance>, handle: InstanceHandle) : dev.engine_room.flywheel.lib.instance.TransformedInstance(type, handle) {
-
-	var vScale: Float = 1f
-    var uScale: Float = 1f
-
-    var v0: Float = 1f
-    var u0: Float = 1f
-}
-
-object InstanceTypes {
-    val SCALING_FLUID = SimpleInstanceType.builder(::ScalingFluidInstance)
-		.cullShader(Create.asResource("instance/cull/fluid.glsl"))
-		.vertexShader(Taurine("instance/scaling_fluid.vert"))
-		.layout(
-            LayoutBuilder.create()
-			.matrix("pose", FloatRepr.FLOAT, 4)
-			.vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
-			.vector("light", IntegerRepr.SHORT, 2)
-			.vector("overlay", IntegerRepr.SHORT, 2)
-			.scalar("vScale", FloatRepr.FLOAT)
-			.scalar("uScale", FloatRepr.FLOAT)
-            .scalar("v0", FloatRepr.FLOAT)
-			.scalar("u0", FloatRepr.FLOAT)
-			.build())
-		.writer { ptr, instance ->
-            ExtraMemoryOps.putMatrix4f(ptr, instance.pose)
-            MemoryUtil.memPutByte(ptr + 64, instance.red)
-            MemoryUtil.memPutByte(ptr + 65, instance.green)
-            MemoryUtil.memPutByte(ptr + 66, instance.blue)
-            MemoryUtil.memPutByte(ptr + 67, instance.alpha)
-            ExtraMemoryOps.put2x16(ptr + 68, instance.light)
-            ExtraMemoryOps.put2x16(ptr + 72, instance.overlay)
-            MemoryUtil.memPutFloat(ptr + 76, instance.vScale)
-            MemoryUtil.memPutFloat(ptr + 80, instance.uScale)
-            MemoryUtil.memPutFloat(ptr + 84, instance.v0)
-            MemoryUtil.memPutFloat(ptr + 88, instance.u0)
-        }
-        .build()
-}
 
 class BasinVisual(
     visualizationContext: VisualizationContext, be: BasinBlockEntity, delta: Float
@@ -99,7 +48,7 @@ class BasinVisual(
 
     val fluidInstances = SmartPreservingRecycler<TextureAtlasSprite, ScalingFluidInstance> {
         visualizationContext.instancerProvider().instancer(
-            InstanceTypes.SCALING_FLUID,
+            TaurineInstanceTypes.SCALING_FLUID,
             FluidMesh.surface(it, 12f / 16f)
         ).createInstance()
     }
