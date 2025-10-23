@@ -1,4 +1,4 @@
-package io.taurine.mixin;
+package io.taurine.mixin.minecraft.accessor;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

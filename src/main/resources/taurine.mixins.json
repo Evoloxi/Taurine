@@ -4,7 +4,21 @@
   "package": "io.taurine.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ItemStackAccessor"
+    "minecraft.accessor.ItemStackAccessor",
+    "create.accessor.BasinBlockEntityAccessor",
+    "create.BasinBlockEntityMixin",
+    "create.BeltRendererMixin",
+    "create.BlockEntityWithFilterSlotRendererMixin",
+    "create.DepotBehaviourMixin",
+    "create.DepotRendererMixin",
+    "create.FilteringBehaviourMixin",
+    "create.FilteringRendererMixin",
+    "create.LinkBehaviourMixin",
+    "create.SawVisualMixin",
+    "create.accessor.DepotBehaviourAccessor",
+    "create.accessor.FilteringBehaviourAccessor",
+    "create.accessor.LinkBehaviourAccessor",
+    "vanillin.ItemModelsMixin"
   ],
   "client": [
   ],

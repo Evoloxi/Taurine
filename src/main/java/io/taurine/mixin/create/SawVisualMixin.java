@@ -1,0 +1,37 @@
+package io.taurine.mixin.create;
+
+import com.simibubi.create.content.kinetics.saw.SawBlockEntity;
+import com.simibubi.create.content.kinetics.saw.SawVisual;
+import dev.engine_room.flywheel.api.visualization.VisualizationContext;
+import io.taurine.visuals.FilterVisual;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(SawVisual.class)
+public class SawVisualMixin {
+    @Unique
+    private FilterVisual<SawBlockEntity> filterVisual;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    void init(VisualizationContext context, SawBlockEntity blockEntity, float partialTick, CallbackInfo ci) {
+        filterVisual = new FilterVisual<>(context, blockEntity, partialTick);
+    }
+
+    @Inject(method = "updateLight", at = @At("TAIL"))
+    private void onUpdateLight(float partialTick, CallbackInfo ci) {
+        filterVisual.updateLight(partialTick);
+    }
+
+    @Inject(method = "update", at = @At("TAIL"))
+    private void onUpdate(float pt, CallbackInfo ci) {
+        filterVisual.update(pt);
+    }
+
+    @Inject(method = "_delete", at = @At("TAIL"))
+    private void onUpdate(CallbackInfo ci) {
+        filterVisual.delete();
+    }
+}
