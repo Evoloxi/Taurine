@@ -1,4 +1,4 @@
-package io.taurine.mixin.flywheel;
+package io.taurine.mixin.flywheel.accessor;
 
 import dev.engine_room.flywheel.api.instance.InstancerProvider;
 import dev.engine_room.flywheel.lib.visual.AbstractVisual;

@@ -46,7 +46,7 @@ class BasinVisual(
 ), SimpleDynamicVisual, ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.GROUND
-    override val itemRendering by itemRenderingDelegate
+    override val dispatcher by dispatcherDelegate
 
     val filters = FilterVisual<BasinBlockEntity>(visualizationContext, blockEntity, delta)
 
@@ -60,10 +60,7 @@ class BasinVisual(
     var fluidLevel = 0f
 
     fun updateInstances(partialTicks: Float, ms: PoseStack) {
-        /* TODO: fluid rendering
-            val fluidLevel: Float = renderFluids(basin, partialTicks, ms, buffer, light, overlay)
-        */
-        //val level = Mth.clamp(fluidLevel - .3f, .125f, .6f)
+        // TODO: animate items bobbing up and down when fluid is present
         val level = Mth.clamp(fluidLevel - .3f, .125f, .6f)
 
         ms.pushPose()
@@ -105,7 +102,7 @@ class BasinVisual(
                 val vec = VecHelper.offsetRandomly(Vec3.ZERO, r, 1 / 16f)
 
                 ms.translate(vec.x, vec.y, vec.z)
-                itemRendering.renderItem(ms,stack)
+                dispatcher.renderItem(ms,stack)
                 ms.popPose()
             }
             ms.popPose()
@@ -136,20 +133,22 @@ class BasinVisual(
             TransformStack.of(ms).translate(outVec).translate(Vec3(0.0, max(-.55f, -(progress * progress * 2)).toDouble(), 0.0))
                 .translate(directionVec.scale((progress * .5f).toDouble())).rotateYDegrees(AngleHelper.horizontalAngle(direction))
                 .rotateXDegrees(progress * 180)
-            itemRendering.renderItem(ms, intAttached.getValue())
+            dispatcher.renderItem(ms, intAttached.getValue())
             ms.popPose()
         }
     }
 
     override fun update(partialTick: Float) {
-        itemRendering.instances.resetCount()
+        dispatcher.instances.resetCount()
         val ms = PoseStack().apply {
             translate(visualPosition)
         }
         updateInstances(partialTick, ms)
         updateLight(partialTick)
-        itemRendering.instances.discardExtra()
+        dispatcher.instances.discardExtra()
+
         filters.update(partialTick)
+
         fluidLevel = rebuildFluids(partialTick, ms)
     }
 
@@ -216,7 +215,7 @@ class BasinVisual(
                 val tint = clientFluid.getTintColor(renderedFluid.fluid.defaultFluidState(), level, pos)
 
                 // TODO: vertical fluid separation plane
-
+                // TODO: emission
                 fluidInstances.get(sprite).apply {
                     setIdentityTransform()
                     setTransform(ms)
@@ -240,8 +239,9 @@ class BasinVisual(
         updateLight(partialTick)
         return yMax
     }
+
     override fun _delete() {
-        itemRendering.instances.delete()
+        dispatcher.instances.delete()
         filters.delete()
         fluidInstances.delete()
     }
@@ -260,7 +260,7 @@ class BasinVisual(
             light = packed
             setChanged()
         }
-        itemRendering.updateLight(packed)
+        dispatcher.updateLight(packed)
     }
 
     override fun beginFrame(ctx: DynamicVisual.Context) {

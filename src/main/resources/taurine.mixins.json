@@ -21,7 +21,7 @@
     "create.accessor.DepotBlockEntityAccessor",
     "create.accessor.FilteringBehaviourAccessor",
     "create.accessor.LinkBehaviourAccessor",
-    "flywheel.AbstractVisualAccessor",
+    "flywheel.accessor.AbstractVisualAccessor",
     "minecraft.accessor.ItemStackAccessor",
     "vanillin.ItemModelsMixin"
   ],
@@ -33,5 +33,10 @@
   },
   "mixinextras": {
     "minVersion": "0.5.0"
-  }
+  },
+  "mixins": [
+    "gnkinetics.ChainableCogwheelRendererMixin",
+    "gnkinetics.GearsBETypesMixin",
+    "gnkinetics.accessor.CustomCogWheelBlockAccessor"
+  ]
 }

@@ -36,7 +36,7 @@ class DepotVisual(
 ), SimpleDynamicVisual, ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.FIXED
-    override val itemRendering by itemRenderingDelegate
+    override val dispatcher by dispatcherDelegate
 
     private inline fun forAllIncomingItems(action: (TransportedItemStack) -> Unit) {
         val list = mutableListOf<TransportedItemStack>()
@@ -148,7 +148,7 @@ class DepotVisual(
                 msr.rotateXDegrees(90f)
             }
 
-            itemRendering.instances.get(stack).apply {
+            dispatcher.instances.get(stack).apply {
                 setIdentityTransform()
                 setTransform(ms)
                 light = stackLight
@@ -186,9 +186,9 @@ class DepotVisual(
     }
 
     fun animate(delta: Float) {
-        itemRendering.instances.resetCount()
+        dispatcher.instances.resetCount()
         updateInstances(delta)
-        itemRendering.instances.discardExtra()
+        dispatcher.instances.discardExtra()
     }
 
     override fun update(delta: Float) {
@@ -197,7 +197,7 @@ class DepotVisual(
     }
 
     override fun _delete() {
-        itemRendering.instances.delete()
+        dispatcher.instances.delete()
     }
 
     override fun collectCrumblingInstances(consumer: Consumer<Instance?>) = Unit

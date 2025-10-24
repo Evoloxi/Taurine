@@ -26,7 +26,7 @@ interface ValueBoxVisual : ItemRendering {
         val zOffset = (if (!blockItem) -0.15f else 0f) + customZOffset(filter.item)
         ms.scale(scale, scale, scale)
         ms.translate(0f, 0f, zOffset)
-        itemRendering.renderItem(ms, filter)
+        dispatcher.renderItem(ms, filter)
     }
 
     private fun customZOffset(item: Item): Float {

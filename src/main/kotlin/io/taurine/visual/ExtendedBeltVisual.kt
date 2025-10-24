@@ -37,7 +37,7 @@ class ExtendedBeltVisual(
 ), SimpleDynamicVisual, LightUpdatedVisual, ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.FIXED
-    override val itemRendering by itemRenderingDelegate // TODO: custom instance types
+    override val dispatcher by dispatcherDelegate // TODO: custom instance types
 
 
     /*    private val hashToModel = Int2ObjectOpenHashMap<Model>()
@@ -245,7 +245,7 @@ class ExtendedBeltVisual(
 
             itemMatrix.scale(scaleValue, scaleValue, scaleValue)
 
-            itemRendering.instances.get(itemStack).apply {
+            dispatcher.instances.get(itemStack).apply {
                 setTransform(itemMatrix)
                 if (updateLight) light(stackLight)
                 setChanged()
@@ -278,7 +278,7 @@ class ExtendedBeltVisual(
 
         if (!dirty && belt.speed == 0f && !belt.networkDirty) return
 
-        itemRendering.instances.resetCount()
+        dispatcher.instances.resetCount()
         shadows.resetCount()
 
         val beltFacing = belt.blockState.getValue(BeltBlock.HORIZONTAL_FACING)
@@ -295,7 +295,7 @@ class ExtendedBeltVisual(
             if (ModelCache.isSupported(stack.stack)) {
                 if (!dirty && stack.beltPosition == stack.prevBeltPosition && stack.sideOffset == stack.prevSideOffset) { // TODO dynamic aka upright items
                     val count = Mth.log2(stack.stack.count) / 2 + 1
-                    itemRendering.instances.preserve(stack.stack, count)
+                    dispatcher.instances.preserve(stack.stack, count)
                     shadows.preserve(1)
                     continue
                 }
@@ -318,7 +318,7 @@ class ExtendedBeltVisual(
         }
 
         pPoseStack.popPose()
-        itemRendering.instances.discardExtra()
+        dispatcher.instances.discardExtra()
         shadows.discardExtra()
 
         dirty = false
@@ -326,7 +326,7 @@ class ExtendedBeltVisual(
     }
 
     override fun _delete() {
-        itemRendering.instances.delete()
+        dispatcher.instances.delete()
         shadows.delete()
         super._delete()
     }

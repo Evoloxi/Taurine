@@ -23,7 +23,7 @@ class LinkVisual<T : SmartBlockEntity>(
     visualizationContext, be, delta
 ), ValueBoxVisual {
     override val itemDisplayContext = ItemDisplayContext.FIXED
-    override val itemRendering by itemRenderingDelegate
+    override val dispatcher by dispatcherDelegate
 
     override fun renderOnBlockEntity(ms: PoseStack) {
         if (blockEntity.isRemoved) return
@@ -48,17 +48,17 @@ class LinkVisual<T : SmartBlockEntity>(
     }
 
     override fun update(partialTick: Float) {
-        itemRendering.instances.resetCount()
+        dispatcher.instances.resetCount()
         val ms = PoseStack().apply {
             translate(visualPos)
         }
         renderOnBlockEntity(ms)
         updateLight(partialTick)
-        itemRendering.instances.discardExtra()
+        dispatcher.instances.discardExtra()
     }
 
     override fun _delete() {
-        itemRendering.instances.delete()
+        dispatcher.instances.delete()
     }
 
     override fun collectCrumblingInstances(p0: Consumer<Instance?>?) {
@@ -69,7 +69,7 @@ class LinkVisual<T : SmartBlockEntity>(
             level.getBrightness(LightLayer.BLOCK, pos),
             level.getBrightness(LightLayer.SKY, pos)
         )
-        itemRendering.instances.applyToAll {
+        dispatcher.instances.applyToAll {
             light = packed
             setChanged()
         }

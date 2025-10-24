@@ -4,6 +4,6 @@ import net.minecraft.world.item.ItemDisplayContext
 
 interface ItemRendering {
     val itemDisplayContext: ItemDisplayContext
-    val itemRendering: ItemRenderingHelper
+    val dispatcher: ItemRenderingHelper
 }
 

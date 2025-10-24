@@ -2,7 +2,7 @@ package io.taurine.extension.inaccessible
 
 import dev.engine_room.flywheel.api.instance.InstancerProvider
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import io.taurine.mixin.flywheel.AbstractVisualAccessor
+import io.taurine.mixin.flywheel.accessor.AbstractVisualAccessor
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 

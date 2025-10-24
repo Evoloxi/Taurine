@@ -21,5 +21,5 @@ class ItemRenderingDelegate<T : BlockEntity>(
     }
 }
 
-val <T : BlockEntity> AbstractBlockEntityVisual<T>.itemRenderingDelegate
+val <T : BlockEntity> AbstractBlockEntityVisual<T>.dispatcherDelegate
     get() = ItemRenderingDelegate(this)
