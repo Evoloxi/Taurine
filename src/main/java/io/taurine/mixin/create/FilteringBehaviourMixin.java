@@ -19,7 +19,7 @@ public abstract class FilteringBehaviourMixin extends BlockEntityBehaviour {
     }
 
     @Inject(method = "read", at = @At("TAIL"))
-    void asd(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    void queueUpdate(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
         CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> VisualizationHelper.queueUpdate(blockEntity));
     }
 }

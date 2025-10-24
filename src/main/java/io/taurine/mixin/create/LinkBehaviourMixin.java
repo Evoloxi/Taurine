@@ -19,7 +19,7 @@ public abstract class LinkBehaviourMixin extends BlockEntityBehaviour {
     }
 
     @Inject(method = "read", at = @At("TAIL"))
-    private void onRead(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    private void queueUpdate(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
         CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> VisualizationHelper.queueUpdate(this.blockEntity));
     }
 }
