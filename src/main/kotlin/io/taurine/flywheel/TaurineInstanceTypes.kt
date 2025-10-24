@@ -1,4 +1,4 @@
-package io.taurine.visual
+package io.taurine.flywheel
 
 import com.simibubi.create.Create
 import dev.engine_room.flywheel.api.layout.FloatRepr

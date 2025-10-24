@@ -5,7 +5,7 @@ import dev.engine_room.flywheel.api.instance.InstancerProvider
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.vanillin.item.ItemModels
-import io.taurine.SmartPreservingRecycler
+import io.taurine.flywheel.SmartPreservingRecycler
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level

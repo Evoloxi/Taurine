@@ -3,22 +3,17 @@ package io.taurine.visual
 import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.content.redstone.link.LinkBehaviour
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
-import com.simibubi.create.infrastructure.config.AllConfigs
 import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import io.taurine.ModelCache
 import io.taurine.extension.inaccessible.firstSlot
 import io.taurine.extension.inaccessible.frequencyFirst
 import io.taurine.extension.inaccessible.frequencyLast
 import io.taurine.extension.inaccessible.secondSlot
 import io.taurine.extension.translate
 import net.createmod.catnip.data.Iterate
-import net.createmod.catnip.math.VecHelper
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer
 import java.util.function.Consumer
 

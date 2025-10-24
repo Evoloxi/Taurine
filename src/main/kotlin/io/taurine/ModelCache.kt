@@ -1,15 +1,7 @@
 package io.taurine
 
-import dev.engine_room.flywheel.api.model.Model
-import dev.engine_room.flywheel.lib.material.Materials
 import dev.engine_room.flywheel.lib.util.RendererReloadCache
 import dev.engine_room.vanillin.item.ItemModels
-import dev.engine_room.vanillin.item.ItemModels.*
-import io.taurine.mixin.minecraft.accessor.ItemStackAccessor
-import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.model.BakedModel
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 
 object ModelCache {

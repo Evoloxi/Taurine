@@ -9,11 +9,9 @@ import com.simibubi.create.foundation.blockEntity.behaviour.filtering.SidedFilte
 import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import io.taurine.ModelCache
 import io.taurine.extension.translate
 import net.createmod.catnip.data.Iterate
 import net.minecraft.client.renderer.LightTexture
-import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer

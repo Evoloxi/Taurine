@@ -11,12 +11,14 @@ import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.transform.TransformStack
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import io.taurine.SmartPreservingRecycler
+import io.taurine.flywheel.SmartPreservingRecycler
 import io.taurine.extension.inaccessible.ingredientRotation
 import io.taurine.extension.inaccessible.itemCapability
 import io.taurine.extension.inaccessible.visualizedOutputItems
 import io.taurine.extension.pixel
 import io.taurine.extension.translate
+import io.taurine.flywheel.ScalingFluidInstance
+import io.taurine.flywheel.TaurineInstanceTypes
 import net.createmod.catnip.animation.AnimationTickHolder
 import net.createmod.catnip.math.AngleHelper
 import net.createmod.catnip.math.VecHelper
@@ -29,7 +31,6 @@ import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions

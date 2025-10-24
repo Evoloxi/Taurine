@@ -21,14 +21,21 @@
     "create.accessor.DepotBlockEntityAccessor",
     "create.accessor.FilteringBehaviourAccessor",
     "create.accessor.LinkBehaviourAccessor",
+    "flywheel.AbstractVisualAccessor",
     "minecraft.accessor.ItemStackAccessor",
-    "vanillin.ItemModelsMixin",
-    "flywheel.AbstractVisualAccessor"
+    "vanillin.ItemModelsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
+  },
+  "mixins": [
+    "flywheel.IndirectCullingGroupMixin",
+    "flywheel.IndirectDrawManagerMixin"
+  ],
+  "mixinextras": {
+    "minVersion": "0.5.0"
   }
 }

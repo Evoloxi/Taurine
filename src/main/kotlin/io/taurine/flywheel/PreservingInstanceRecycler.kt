@@ -1,4 +1,4 @@
-package io.taurine
+package io.taurine.flywheel
 
 import dev.engine_room.flywheel.api.instance.Instance
 

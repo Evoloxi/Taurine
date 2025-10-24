@@ -10,12 +10,10 @@ import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visual.LightUpdatedVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
-import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache
-import io.taurine.PreservingInstanceRecycler
-import io.taurine.SmartPreservingRecycler
+import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
 import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.client.Minecraft
@@ -25,7 +23,6 @@ import net.minecraft.core.Vec3i
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.AABB
@@ -65,7 +62,7 @@ class ExtendedBeltVisual(
         if (level is PonderLevel)
             return false
 
-        val accessor = Minecraft.getInstance().levelRenderer as LevelRendererAccessor;
+        val accessor = Minecraft.getInstance().levelRenderer as LevelRendererAccessor
         val frustum = accessor.`create$getCapturedFrustum`() ?: accessor.`create$getCullingFrustum`()
 
         val itemBB = AABB(
@@ -80,7 +77,7 @@ class ExtendedBeltVisual(
         return !frustum!!.isVisible(itemBB)
     }
 
-    var relight = true
+    var relight = true // TODO
     override fun updateLight(partialTick: Float) {
         dirty = true
         relight = true
