@@ -18,7 +18,6 @@ object TaurineInstanceTypes {
 			.matrix("pose", FloatRepr.FLOAT, 4)
 			.vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
 			.vector("light", IntegerRepr.SHORT, 2)
-			.vector("overlay", IntegerRepr.SHORT, 2)
 			.scalar("vScale", FloatRepr.FLOAT)
 			.scalar("uScale", FloatRepr.FLOAT)
             .scalar("v0", FloatRepr.FLOAT)
@@ -31,11 +30,10 @@ object TaurineInstanceTypes {
             MemoryUtil.memPutByte(ptr + 66, instance.blue)
             MemoryUtil.memPutByte(ptr + 67, instance.alpha)
             ExtraMemoryOps.put2x16(ptr + 68, instance.light)
-            ExtraMemoryOps.put2x16(ptr + 72, instance.overlay)
-            MemoryUtil.memPutFloat(ptr + 76, instance.vScale)
-            MemoryUtil.memPutFloat(ptr + 80, instance.uScale)
-            MemoryUtil.memPutFloat(ptr + 84, instance.v0)
-            MemoryUtil.memPutFloat(ptr + 88, instance.u0)
+            MemoryUtil.memPutFloat(ptr + 72, instance.vScale)
+            MemoryUtil.memPutFloat(ptr + 76, instance.uScale)
+            MemoryUtil.memPutFloat(ptr + 80, instance.v0)
+            MemoryUtil.memPutFloat(ptr + 84, instance.u0)
         }
         .build()
 }

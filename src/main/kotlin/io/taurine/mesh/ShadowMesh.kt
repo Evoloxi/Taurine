@@ -47,7 +47,7 @@ object ShadowMesh : QuadMesh {
         .texture(SHADOW_TEXTURE)
         .mipmap(false)
         .polygonOffset(true)
-        .transparency(Transparency.TRANSLUCENT) // TODO: convert flywheel patch to mixins
+        .transparency(Transparency.TRANSLUCENT)
         .writeMask(WriteMask.COLOR)
         .build()
     val SHADOW_MODEL = SingleMeshModel(ShadowMesh, SHADOW_MATERIAL)

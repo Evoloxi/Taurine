@@ -23,7 +23,10 @@
     "create.accessor.LinkBehaviourAccessor",
     "flywheel.accessor.AbstractVisualAccessor",
     "minecraft.accessor.ItemStackAccessor",
-    "vanillin.ItemModelsMixin"
+    "vanillin.ItemModelsMixin",
+    "gnkinetics.ChainableCogwheelRendererMixin",
+    "gnkinetics.GearsBETypesMixin",
+    "gnkinetics.accessor.CustomCogWheelBlockAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -33,10 +36,5 @@
   },
   "mixinextras": {
     "minVersion": "0.5.0"
-  },
-  "mixins": [
-    "gnkinetics.ChainableCogwheelRendererMixin",
-    "gnkinetics.GearsBETypesMixin",
-    "gnkinetics.accessor.CustomCogWheelBlockAccessor"
-  ]
+  }
 }
