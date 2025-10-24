@@ -7,17 +7,16 @@ import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity
 import dev.engine_room.flywheel.api.instance.Instance
-import dev.engine_room.flywheel.api.model.Model
 import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.transform.TransformStack
+import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import io.taurine.ModelCache
 import io.taurine.extension.inaccessible.depotBehaviour
 import io.taurine.extension.inaccessible.heldItem
 import io.taurine.extension.inaccessible.incoming
 import io.taurine.extension.inaccessible.processingOutputBuffer
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.createmod.catnip.math.VecHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
@@ -32,16 +31,16 @@ import java.util.function.Consumer
 
 class DepotVisual(
     visualizationContext: VisualizationContext, be: DepotBlockEntity, delta: Float
-) : ItemRenderingBlockEntityVisual<DepotBlockEntity>(
+) : AbstractBlockEntityVisual<DepotBlockEntity>(
     visualizationContext, be, delta
-), SimpleDynamicVisual {
+), SimpleDynamicVisual, ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.FIXED
-    val hashToModel = Int2ObjectOpenHashMap<Model>()
+    override val itemRendering by itemRenderingDelegate
 
-    inline fun forAllIncomingItems(action: (TransportedItemStack) -> Unit) {
+    private inline fun forAllIncomingItems(action: (TransportedItemStack) -> Unit) {
         val list = mutableListOf<TransportedItemStack>()
-        val behaviour = be.depotBehaviour
+        val behaviour = blockEntity.depotBehaviour
         behaviour.heldItem?.let(list::add)
         list.addAll(behaviour.incoming)
         for (tis in list.filter { ModelCache.isSupported(it.stack) }) {
@@ -57,10 +56,10 @@ class DepotVisual(
         ms.translate(.5f, 15 / 16f, .5f)
 
         val light = LightTexture.pack(
-            level.getBrightness(LightLayer.BLOCK, be.blockPos),
-            level.getBrightness(LightLayer.SKY, be.blockPos)
+            level.getBrightness(LightLayer.BLOCK, pos),
+            level.getBrightness(LightLayer.SKY, pos)
         )
-        val itemPosition = VecHelper.getCenterOf(be.blockPos)
+        val itemPosition = VecHelper.getCenterOf(pos)
 
         forAllIncomingItems { tis ->
             ms.pushPose()
@@ -85,8 +84,8 @@ class DepotVisual(
             ms.popPose()
         }
 
-        for (i in 0..<be.depotBehaviour.processingOutputBuffer.slots) {
-            val stack = be.depotBehaviour.processingOutputBuffer.getStackInSlot(i)
+        for (i in 0..< blockEntity.depotBehaviour.processingOutputBuffer.slots) {
+            val stack = blockEntity.depotBehaviour.processingOutputBuffer.getStackInSlot(i)
             if (stack.isEmpty) continue
             ms.pushPose()
             msr.nudge(i)
@@ -149,7 +148,7 @@ class DepotVisual(
                 msr.rotateXDegrees(90f)
             }
 
-            instances.get(stack).apply {
+            itemRendering.instances.get(stack).apply {
                 setIdentityTransform()
                 setTransform(ms)
                 light = stackLight
@@ -171,7 +170,7 @@ class DepotVisual(
     var dirty = false
     override fun beginFrame(ctx: DynamicVisual.Context) {
         if (!dirty) return
-        val diff: Float = .5f - (be.depotBehaviour.heldItem?.beltPosition ?: run {
+        val diff: Float = .5f - (blockEntity.depotBehaviour.heldItem?.beltPosition ?: run {
             dirty = false
             return
         })
@@ -187,9 +186,9 @@ class DepotVisual(
     }
 
     fun animate(delta: Float) {
-        instances.resetCount()
+        itemRendering.instances.resetCount()
         updateInstances(delta)
-        instances.discardExtra()
+        itemRendering.instances.discardExtra()
     }
 
     override fun update(delta: Float) {
@@ -198,7 +197,7 @@ class DepotVisual(
     }
 
     override fun _delete() {
-        instances.delete()
+        itemRendering.instances.delete()
     }
 
     override fun collectCrumblingInstances(consumer: Consumer<Instance?>) = Unit

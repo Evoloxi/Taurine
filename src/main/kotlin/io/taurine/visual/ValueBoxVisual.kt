@@ -11,9 +11,7 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.FenceBlock
 
-interface ValueBoxVisual {
-
-    fun renderItem(ms: PoseStack, item: ItemStack)
+interface ValueBoxVisual : ItemRendering {
 
     fun renderOnBlockEntity(ms: PoseStack)
 
@@ -28,7 +26,7 @@ interface ValueBoxVisual {
         val zOffset = (if (!blockItem) -0.15f else 0f) + customZOffset(filter.item)
         ms.scale(scale, scale, scale)
         ms.translate(0f, 0f, zOffset)
-        renderItem(ms, filter)
+        itemRendering.renderItem(ms, filter)
     }
 
     private fun customZOffset(item: Item): Float {

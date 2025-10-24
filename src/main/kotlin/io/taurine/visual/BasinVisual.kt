@@ -5,9 +5,11 @@ import com.simibubi.create.content.fluids.FluidMesh
 import com.simibubi.create.content.processing.basin.BasinBlock
 import com.simibubi.create.content.processing.basin.BasinBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour
+import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.transform.TransformStack
+import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import io.taurine.SmartPreservingRecycler
 import io.taurine.extension.inaccessible.ingredientRotation
@@ -33,15 +35,17 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
 import net.neoforged.neoforge.items.IItemHandlerModifiable
 import net.neoforged.neoforge.items.ItemStackHandler
+import java.util.function.Consumer
 import kotlin.math.max
 
 class BasinVisual(
     visualizationContext: VisualizationContext, be: BasinBlockEntity, delta: Float
-) : ItemRenderingBlockEntityVisual<BasinBlockEntity>(
+) : AbstractBlockEntityVisual<BasinBlockEntity>(
     visualizationContext, be, delta
-), SimpleDynamicVisual {
+), SimpleDynamicVisual, ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.GROUND
+    override val itemRendering by itemRenderingDelegate
 
     val filters = FilterVisual<BasinBlockEntity>(visualizationContext, blockEntity, delta)
 
@@ -100,7 +104,7 @@ class BasinVisual(
                 val vec = VecHelper.offsetRandomly(Vec3.ZERO, r, 1 / 16f)
 
                 ms.translate(vec.x, vec.y, vec.z)
-                renderItem(ms,stack)
+                itemRendering.renderItem(ms,stack)
                 ms.popPose()
             }
             ms.popPose()
@@ -131,19 +135,19 @@ class BasinVisual(
             TransformStack.of(ms).translate(outVec).translate(Vec3(0.0, max(-.55f, -(progress * progress * 2)).toDouble(), 0.0))
                 .translate(directionVec.scale((progress * .5f).toDouble())).rotateYDegrees(AngleHelper.horizontalAngle(direction))
                 .rotateXDegrees(progress * 180)
-            renderItem(ms, intAttached.getValue())
+            itemRendering.renderItem(ms, intAttached.getValue())
             ms.popPose()
         }
     }
 
     override fun update(partialTick: Float) {
-        instances.resetCount()
+        itemRendering.instances.resetCount()
         val ms = PoseStack().apply {
             translate(visualPosition)
         }
         updateInstances(partialTick, ms)
         updateLight(partialTick)
-        instances.discardExtra()
+        itemRendering.instances.discardExtra()
         filters.update(partialTick)
         fluidLevel = rebuildFluids(partialTick, ms)
     }
@@ -236,7 +240,7 @@ class BasinVisual(
         return yMax
     }
     override fun _delete() {
-        instances.delete()
+        itemRendering.instances.delete()
         filters.delete()
         fluidInstances.delete()
     }
@@ -246,7 +250,6 @@ class BasinVisual(
     }
 
     override fun updateLight(partialTick: Float) { // don't really gaf
-        super.updateLight(partialTick)
         filters.updateLight(partialTick)
         val packed = LightTexture.pack(
             level.getBrightness(LightLayer.BLOCK, pos),
@@ -256,9 +259,14 @@ class BasinVisual(
             light = packed
             setChanged()
         }
+        itemRendering.updateLight(packed)
     }
 
     override fun beginFrame(ctx: DynamicVisual.Context) {
         rebuildFluids(ctx.partialTick(), PoseStack().apply { translate(visualPosition) })
+    }
+
+    override fun collectCrumblingInstances(p0: Consumer<Instance?>?) {
+
     }
 }

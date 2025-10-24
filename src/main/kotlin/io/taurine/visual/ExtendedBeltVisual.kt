@@ -37,32 +37,25 @@ class ExtendedBeltVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
 ) : BeltVisual(
     ctx, belt, partialTick
-), SimpleDynamicVisual, LightUpdatedVisual {
+), SimpleDynamicVisual, LightUpdatedVisual, ItemRendering {
 
-    val instances = SmartPreservingRecycler<ItemStack, TransformedInstance> {
-        instancerProvider().instancer(
-            InstanceTypes.TRANSFORMED,
-            ItemModels.get(
-                level,
-                it,
-                ItemDisplayContext.FIXED
-            )
-        ).createInstance()
-    }
+    override val itemDisplayContext = ItemDisplayContext.FIXED
+    override val itemRendering by itemRenderingDelegate // TODO: custom instance types
 
-/*    private val hashToModel = Int2ObjectOpenHashMap<Model>()
-    private var modelKeys = hashToModel.keys
 
-    fun updateModelsForItems(items: List<TransportedItemStack>) {
-        for (item in items) {
-            val hash = hashItem(item.stack)
-            if (!modelKeys.contains(hash) && ModelCache.isSupported(item.stack)) {
-                val model = ModelCache.getModel(item.stack, ItemDisplayContext.FIXED)!! // TODO: context
-                hashToModel[hash] = model
+    /*    private val hashToModel = Int2ObjectOpenHashMap<Model>()
+        private var modelKeys = hashToModel.keys
+
+        fun updateModelsForItems(items: List<TransportedItemStack>) {
+            for (item in items) {
+                val hash = hashItem(item.stack)
+                if (!modelKeys.contains(hash) && ModelCache.isSupported(item.stack)) {
+                    val model = ModelCache.getModel(item.stack, ItemDisplayContext.FIXED)!! // TODO: context
+                    hashToModel[hash] = model
+                }
             }
-        }
-        modelKeys = hashToModel.keys
-    }*/
+            modelKeys = hashToModel.keys
+        }*/
 
     val shadows = PreservingInstanceRecycler {
         instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 1).createInstance()
@@ -128,7 +121,7 @@ class ExtendedBeltVisual(
         val verticalMovement = if (offset < 0.5f) 0f else {
             verticality * (Mth.clamp(offset, 0.5f, beltLength - 0.5f) - 0.5f)
         }
-        // TODO: start: combine arithmetics & avoid creating objects
+
         val offsetVec = Vector3f(directionVec.x.toFloat(), directionVec.y.toFloat(), directionVec.z.toFloat())
             .mul(offset)
         if (verticalMovement != 0f) offsetVec.add(0f, verticalMovement, 0f)
@@ -145,7 +138,7 @@ class ExtendedBeltVisual(
             visualPosition.y.toDouble() + offsetVec.y,
             visualPosition.z.toDouble() + offsetVec.z
         )
-        // TODO: end
+
         /*if (shouldCullItem(itemPos, level)) { // TODO: move to somwhere else?
             return
         }*/
@@ -255,7 +248,7 @@ class ExtendedBeltVisual(
 
             itemMatrix.scale(scaleValue, scaleValue, scaleValue)
 
-            instances.get(itemStack).apply {
+            itemRendering.instances.get(itemStack).apply {
                 setTransform(itemMatrix)
                 if (updateLight) light(stackLight)
                 setChanged()
@@ -288,7 +281,7 @@ class ExtendedBeltVisual(
 
         if (!dirty && belt.speed == 0f && !belt.networkDirty) return
 
-        instances.resetCount()
+        itemRendering.instances.resetCount()
         shadows.resetCount()
 
         val beltFacing = belt.blockState.getValue(BeltBlock.HORIZONTAL_FACING)
@@ -305,7 +298,7 @@ class ExtendedBeltVisual(
             if (ModelCache.isSupported(stack.stack)) {
                 if (!dirty && stack.beltPosition == stack.prevBeltPosition && stack.sideOffset == stack.prevSideOffset) { // TODO dynamic aka upright items
                     val count = Mth.log2(stack.stack.count) / 2 + 1
-                    instances.preserve(stack.stack, count)
+                    itemRendering.instances.preserve(stack.stack, count)
                     shadows.preserve(1)
                     continue
                 }
@@ -328,7 +321,7 @@ class ExtendedBeltVisual(
         }
 
         pPoseStack.popPose()
-        instances.discardExtra()
+        itemRendering.instances.discardExtra()
         shadows.discardExtra()
 
         dirty = false
@@ -336,7 +329,7 @@ class ExtendedBeltVisual(
     }
 
     override fun _delete() {
-        instances.delete()
+        itemRendering.instances.delete()
         shadows.delete()
         super._delete()
     }

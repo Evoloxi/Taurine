@@ -6,26 +6,32 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.SidedFilteringBehaviour
+import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
+import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import io.taurine.ModelCache
 import io.taurine.extension.translate
 import net.createmod.catnip.data.Iterate
+import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.BlockPos
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.LightLayer
 import net.minecraft.world.level.block.state.BlockState
+import java.util.function.Consumer
 
 class FilterVisual<T : SmartBlockEntity>(
     visualizationContext: VisualizationContext, be: T, delta: Float
-) : ItemRenderingBlockEntityVisual<T>(
+) : AbstractBlockEntityVisual<T>(
     visualizationContext, be, delta
 ), ValueBoxVisual {
     override val itemDisplayContext = ItemDisplayContext.FIXED
+    override val itemRendering by itemRenderingDelegate
 
     override fun renderOnBlockEntity(ms: PoseStack) {
-        if (be.isRemoved) return
+        if (blockEntity.isRemoved) return
 
-        for (b in be.allBehaviours) {
+        for (b in blockEntity.allBehaviours) {
             if (b !is FilteringBehaviour) continue
 
             // TODO: limit render distance, may be not necessary tho
@@ -43,7 +49,7 @@ class FilterVisual<T : SmartBlockEntity>(
             if (b.filter.isEmpty && b !is SidedFilteringBehaviour) continue
 
             val slotPositioning: ValueBoxTransform = b.slotPositioning
-            val blockState: BlockState = be.blockState
+            val blockState: BlockState = blockEntity.blockState
 
             if (slotPositioning is ValueBoxTransform.Sided) {
                 val side = slotPositioning.side
@@ -78,12 +84,28 @@ class FilterVisual<T : SmartBlockEntity>(
     }
 
     override fun update(partialTick: Float) {
-        instances.resetCount()
+        itemRendering.instances.resetCount()
         val ms = PoseStack().apply {
             translate(visualPosition)
         }
         renderOnBlockEntity(ms)
         updateLight(partialTick)
-        instances.discardExtra()
+        itemRendering.instances.discardExtra()
+    }
+
+    override fun _delete() {
+        itemRendering.instances.delete()
+    }
+
+    override fun collectCrumblingInstances(p0: Consumer<Instance?>?) {
+
+    }
+
+    override fun updateLight(p0: Float) {
+        val packed = LightTexture.pack(
+            level.getBrightness(LightLayer.BLOCK, pos),
+            level.getBrightness(LightLayer.SKY, pos)
+        )
+        itemRendering.updateLight(packed)
     }
 }
