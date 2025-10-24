@@ -31,10 +31,6 @@
   "overwrites": {
     "requireAnnotations": true
   },
-  "mixins": [
-    "flywheel.IndirectCullingGroupMixin",
-    "flywheel.IndirectDrawManagerMixin"
-  ],
   "mixinextras": {
     "minVersion": "0.5.0"
   }
