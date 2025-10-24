@@ -7,19 +7,19 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-class ItemRenderingDelegate<Entity : BlockEntity>(
-    private val visual: AbstractBlockEntityVisual<Entity>
+class ItemRenderingDelegate<T : BlockEntity>(
+    private val visual: AbstractBlockEntityVisual<T>
 ) : ReadOnlyProperty<ItemRendering, ItemRenderingHelper> {
     private var helper: ItemRenderingHelper? = null
 
     override fun getValue(thisRef: ItemRendering, property: KProperty<*>): ItemRenderingHelper {
         return helper ?: ItemRenderingHelper(
-            { visual.instancerProvider },
+            visual::instancerProvider,
             visual.level,
             thisRef.itemDisplayContext
         ).also { helper = it }
     }
 }
 
-val <Entity : BlockEntity> AbstractBlockEntityVisual<Entity>.itemRenderingDelegate
+val <T : BlockEntity> AbstractBlockEntityVisual<T>.itemRenderingDelegate
     get() = ItemRenderingDelegate(this)
