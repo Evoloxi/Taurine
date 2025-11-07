@@ -9,6 +9,7 @@ import com.simibubi.create.content.kinetics.belt.BeltSlope;
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack;
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import io.taurine.ModelCache;
+import io.taurine.extension.ItemStackExtensionKt;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -36,7 +37,7 @@ public class BeltRendererMixin {
             require = 2
     )
     boolean filter(BeltRenderer instance, BeltBlockEntity be, float positionVec, PoseStack vectorForOffset, MultiBufferSource diff, int yRot, int renderViewEntity, Direction box, Vec3i v, BeltSlope beltSlope, int i, boolean partialTicks, boolean ms, TransportedItemStack itemStack, Vec3 light) {
-        return !(VisualizationManager.supportsVisualization(be.getLevel()) && ModelCache.isSupported(itemStack.stack));
+        return !(VisualizationManager.supportsVisualization(be.getLevel()) && ItemStackExtensionKt.canBeInstanced(itemStack.stack));
     }
 }
 

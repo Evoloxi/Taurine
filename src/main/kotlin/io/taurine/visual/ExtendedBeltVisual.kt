@@ -13,6 +13,7 @@ import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache
+import io.taurine.extension.canBeInstanced
 import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
 import net.createmod.ponder.api.level.PonderLevel
@@ -39,42 +40,8 @@ class ExtendedBeltVisual(
     override val itemDisplayContext = ItemDisplayContext.FIXED
     override val dispatcher by dispatcherDelegate // TODO: custom instance types
 
-
-    /*    private val hashToModel = Int2ObjectOpenHashMap<Model>()
-        private var modelKeys = hashToModel.keys
-
-        fun updateModelsForItems(items: List<TransportedItemStack>) {
-            for (item in items) {
-                val hash = hashItem(item.stack)
-                if (!modelKeys.contains(hash) && ModelCache.isSupported(item.stack)) {
-                    val model = ModelCache.getModel(item.stack, ItemDisplayContext.FIXED)!! // TODO: context
-                    hashToModel[hash] = model
-                }
-            }
-            modelKeys = hashToModel.keys
-        }*/
-
     val shadows = PreservingInstanceRecycler {
         instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 1).createInstance()
-    }
-
-    fun shouldCullItem(itemPos: Vec3, level: Level): Boolean {
-        if (level is PonderLevel)
-            return false
-
-        val accessor = Minecraft.getInstance().levelRenderer as LevelRendererAccessor
-        val frustum = accessor.`create$getCapturedFrustum`() ?: accessor.`create$getCullingFrustum`()
-
-        val itemBB = AABB(
-            itemPos.x - 0.25,
-            itemPos.y - 0.25,
-            itemPos.z - 0.25,
-            itemPos.x + 0.25,
-            itemPos.y + 0.25,
-            itemPos.z + 0.25
-        )
-
-        return !frustum!!.isVisible(itemBB)
     }
 
     var relight = true // TODO
@@ -267,12 +234,12 @@ class ExtendedBeltVisual(
     var dirty = true
     override fun update(pt: Float) {
         dirty = true
-        //updateModelsForItems(belt.inventory.transportedItems)
         super.update(pt)
     }
 
     override fun beginFrame(ctx: DynamicVisual.Context) {
         if (!belt.isController) return
+        if (doDistanceLimitThisFrame(ctx)) return
 
         val inv = belt.inventory ?: return
 
@@ -291,8 +258,7 @@ class ExtendedBeltVisual(
         val verticality = if (slope == BeltSlope.DOWNWARD) -1 else if (slope == BeltSlope.UPWARD) 1 else 0
         pPoseStack.pushPose()
         for (stack in inv.transportedItems) {
-            //val hash = hashItem(stack.stack)
-            if (ModelCache.isSupported(stack.stack)) {
+            if (stack.stack.canBeInstanced) {
                 if (!dirty && stack.beltPosition == stack.prevBeltPosition && stack.sideOffset == stack.prevSideOffset) { // TODO dynamic aka upright items
                     val count = Mth.log2(stack.stack.count) / 2 + 1
                     dispatcher.instances.preserve(stack.stack, count)
@@ -311,8 +277,7 @@ class ExtendedBeltVisual(
                     belt.getSpeed(),
                     stack,
                     pPoseStack,
-                    RANDOM.get(),
-                    //hash
+                    RANDOM.get()
                 )
             }
         }

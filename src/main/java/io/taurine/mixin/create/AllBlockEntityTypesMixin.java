@@ -2,6 +2,7 @@ package io.taurine.mixin.create;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.simibubi.create.AllBlockEntityTypes;
+import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinBlockEntity;
@@ -10,10 +11,7 @@ import com.simibubi.create.foundation.data.CreateBlockEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
-import io.taurine.visual.BasinVisual;
-import io.taurine.visual.DepotVisual;
-import io.taurine.visual.ExtendedBeltVisual;
-import io.taurine.visual.LinkVisual;
+import io.taurine.visual.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -91,5 +89,23 @@ public class AllBlockEntityTypesMixin {
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
         return instance.visual(() -> LinkVisual::new, false);
+    }
+
+    @ModifyReceiver(
+            method = "<clinit>",
+            slice = @Slice(
+                    from = @At(value = "CONSTANT", args = "stringValue=fluid_tank")
+            ),
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;validBlocks([Lcom/tterrag/registrate/util/nullness/NonNullSupplier;)Lcom/tterrag/registrate/builders/BlockEntityBuilder;",
+                    ordinal = 0
+            )
+    )
+    private static <T extends FluidTankBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToFluidTank(
+            CreateBlockEntityBuilder<T, R> instance,
+            NonNullSupplier<T>[] nonNullSuppliers
+    ) {
+        return instance.visual(() -> FluidTankVisual::new, true);
     }
 }

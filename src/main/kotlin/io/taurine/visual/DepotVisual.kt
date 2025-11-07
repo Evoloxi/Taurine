@@ -12,7 +12,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.transform.TransformStack
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import io.taurine.ModelCache
+import io.taurine.extension.canBeInstanced
 import io.taurine.extension.inaccessible.depotBehaviour
 import io.taurine.extension.inaccessible.heldItem
 import io.taurine.extension.inaccessible.incoming
@@ -43,7 +43,7 @@ class DepotVisual(
         val behaviour = blockEntity.depotBehaviour
         behaviour.heldItem?.let(list::add)
         list.addAll(behaviour.incoming)
-        for (tis in list.filter { ModelCache.isSupported(it.stack) }) {
+        for (tis in list.filter { it.stack.canBeInstanced }) {
             action(tis)
         }
     }

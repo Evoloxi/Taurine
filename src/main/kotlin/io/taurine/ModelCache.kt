@@ -1,40 +1,24 @@
 package io.taurine
 
+import com.google.common.collect.MapMaker
+import dev.engine_room.flywheel.api.event.EndClientResourceReloadEvent
+import dev.engine_room.flywheel.api.event.ReloadLevelRendererEvent
 import dev.engine_room.flywheel.lib.util.RendererReloadCache
 import dev.engine_room.vanillin.item.ItemModels
+import it.unimi.dsi.fastutil.objects.Reference2BooleanOpenHashMap
 import net.minecraft.world.item.ItemStack
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import java.lang.ref.WeakReference
+import java.util.IdentityHashMap
 
 object ModelCache {
-    // TODO: consider com.google.common.collect.MapMaker#MapMaker.weakValues().makeMap() or RendererReloadCache!!!
-    //private val table: Int2ObjectOpenHashMap<Model> = Int2ObjectOpenHashMap()
 
-    /*@Deprecated("replace with record", level = DeprecationLevel.ERROR)
-    fun hashItem(stack: ItemStack, context: ItemDisplayContext = ItemDisplayContext.FIXED): Int {
-        @Suppress("CAST_NEVER_SUCCEEDS")
-        val itemId = BuiltInRegistries.ITEM.getId((stack as ItemStackAccessor).nullableItem)
-        val nbtSize = stack.components.size()
-        val hash = (itemId shl 16) or (nbtSize shl 4) or (context.id.toInt() and 0xF)
-        return hash and Int.MAX_VALUE
-    }*/
-
-    //TODO: maybe we need to account for ponder levels too?
-    /*fun getModel(stack: ItemStack, context: ItemDisplayContext = ItemDisplayContext.FIXED): Model? {
-        return MODEL.get(getKey(stack, context))
-    }*/
-
-/*    fun getKey(stack: ItemStack, context: ItemDisplayContext): BakedModelKey {
-        val baked = ItemModels.getModel(stack)
-        return BakedModelKey(baked, context, Materials.SOLID_BLOCK, stack.hasFoil())
-    }*/
-
-    /*fun getModel(key: BakedModelKey): Model? {
-        return MODEL.get(key)
-    }*/
-
-    //private val supportedCache = ConcurrentHashMap<Int, Boolean>(32, Hash.FAST_LOAD_FACTOR)
-    private val SUPPORTED = RendererReloadCache<ItemStack, Boolean> {
-        ItemModels.isSupported(it)
+    fun reload(event: EndClientResourceReloadEvent) {
+        //SUPPORTED.clear()
     }
+    // need something better fr
+    private val SUPPORTED = RendererReloadCache<ItemStack, Boolean>(ItemModels::isSupported)
 
     @JvmStatic
     fun isSupported(stack: ItemStack): Boolean {

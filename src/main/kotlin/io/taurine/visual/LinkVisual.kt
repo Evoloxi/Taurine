@@ -61,7 +61,7 @@ class LinkVisual<T : SmartBlockEntity>(
         dispatcher.instances.delete()
     }
 
-    override fun collectCrumblingInstances(p0: Consumer<Instance?>?) {
+    override fun collectCrumblingInstances(p0: Consumer<Instance?>) {
     }
 
     override fun updateLight(p0: Float) {

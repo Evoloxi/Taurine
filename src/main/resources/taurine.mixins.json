@@ -14,19 +14,22 @@
     "create.DepotRendererMixin",
     "create.FilteringBehaviourMixin",
     "create.FilteringRendererMixin",
+    "create.FluidTankRendererMixin",
     "create.LinkBehaviourMixin",
     "create.SawVisualMixin",
     "create.accessor.BasinBlockEntityAccessor",
     "create.accessor.DepotBehaviourAccessor",
     "create.accessor.DepotBlockEntityAccessor",
     "create.accessor.FilteringBehaviourAccessor",
+    "create.accessor.FluidTankBlockEntityAccessor",
     "create.accessor.LinkBehaviourAccessor",
     "flywheel.accessor.AbstractVisualAccessor",
-    "minecraft.accessor.ItemStackAccessor",
-    "vanillin.ItemModelsMixin",
     "gnkinetics.ChainableCogwheelRendererMixin",
     "gnkinetics.GearsBETypesMixin",
-    "gnkinetics.accessor.CustomCogWheelBlockAccessor"
+    "gnkinetics.accessor.CustomCogWheelBlockAccessor",
+    "minecraft.ItemStackMixin",
+    "minecraft.accessor.ItemStackAccessor",
+    "vanillin.ItemModelsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

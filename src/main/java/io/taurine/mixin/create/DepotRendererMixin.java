@@ -8,7 +8,7 @@ import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.simibubi.create.content.logistics.depot.DepotRenderer;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import dev.engine_room.flywheel.api.visualization.VisualizationManager;
-import io.taurine.ModelCache;
+import io.taurine.extension.ItemStackExtensionKt;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,7 +32,7 @@ public class DepotRendererMixin {
         }
         supportsVisualization.set(true);
         return instance.stream()
-                .filter(t -> !ModelCache.isSupported(t.stack))
+                .filter(t -> !ItemStackExtensionKt.canBeInstanced(t.stack))
                 .iterator();
     }
 
@@ -44,6 +44,6 @@ public class DepotRendererMixin {
             )
     )
     private static boolean asd(boolean original, @Local(name = "stack") ItemStack stack, @Share("taurine$vis") LocalBooleanRef supportsVisualization) {
-        return original || (supportsVisualization.get() && ModelCache.isSupported(stack));
+        return original || (supportsVisualization.get() && ItemStackExtensionKt.canBeInstanced(stack));
     }
 }

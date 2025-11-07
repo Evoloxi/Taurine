@@ -117,14 +117,14 @@ dependencies {
     implementation 'thedarkcolour:kotlinforforge-neoforge:5.3.0'
     implementation(jarJar('me.fallenbreath:conditional-mixin-neoforge:0.6.4'))
 
-    compileOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
+    //compileOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
     //localRuntime "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
-    localRuntime files(System.getProperty("user.home") + "/IdeaProjects/Flywheel/neoforge/build/libs/flywheel-neoforge-1.21.1-1.0.4.jar")
+    implementation files(System.getProperty("user.home") + "/IdeaProjects/Flywheel/neoforge/build/libs/flywheel-neoforge-1.21.1-1.0.4.jar")
 
     compileOnly "dev.engine-room.vanillin:vanillin-neoforge-${minecraft_version}:${vanillin_version}"
 
     localRuntime "dev.engine-room.vanillin:vanillin-neoforge-${minecraft_version}:${vanillin_version}"
-
+    localRuntime 'maven.modrinth:worldedit:7.3.8'
     // # compat
     implementation 'maven.modrinth:gears-n-kinetics:1.0l'
 
