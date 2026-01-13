@@ -62,12 +62,12 @@ class ExtendedBeltVisual(
         beltLength: Int,
         beltSpeed: Float,
         transported: TransportedItemStack,
-        pPoseStack: PoseStack,
-        random: RandomSource,
+        pPoseStack: PoseStack
         //hash: Int
     ) {
         val itemStack = transported.stack
         val bakedModel = ItemModels.getModel(itemStack)
+        val random = RANDOM.get()
         random.setSeed(transported.angle.toLong())
 
         val offset = if (beltSpeed == 0f) {
@@ -276,8 +276,7 @@ class ExtendedBeltVisual(
                     belt.beltLength,
                     belt.getSpeed(),
                     stack,
-                    pPoseStack,
-                    RANDOM.get()
+                    pPoseStack
                 )
             }
         }

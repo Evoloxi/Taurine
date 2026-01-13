@@ -12,7 +12,14 @@ version = mod_version
 group = mod_group_id
 
 repositories {
-    mavenLocal()
+    exclusiveContent { // Non-OI Translucency fix
+        forRepository {
+            mavenLocal()
+        }
+        filter {
+            includeModule("dev.engine-room.flywheel", "flywheel-neoforge-1.21.1")
+        }
+    }
     maven {
         name = 'Kotlin for Forge'
         url = 'https://thedarkcolour.github.io/KotlinForForge/'
@@ -119,7 +126,9 @@ dependencies {
 
     //compileOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
     //localRuntime "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
-    implementation files(System.getProperty("user.home") + "/IdeaProjects/Flywheel/neoforge/build/libs/flywheel-neoforge-1.21.1-1.0.4.jar")
+    //implementation files(System.getProperty("user.home") + "/IdeaProjects/Flywheel/neoforge/build/libs/flywheel-neoforge-1.21.1-1.0.4.jar")
+    compileOnly "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:1.0.4"
+    localRuntime "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:1.0.4"
 
     compileOnly "dev.engine-room.vanillin:vanillin-neoforge-${minecraft_version}:${vanillin_version}"
 

@@ -170,10 +170,12 @@ class DepotVisual(
     var dirty = false
     override fun beginFrame(ctx: DynamicVisual.Context) {
         if (!dirty) return
-        val diff: Float = .5f - (blockEntity.depotBehaviour.heldItem?.beltPosition ?: run {
+
+        val diff = .5f - (blockEntity.depotBehaviour.heldItem?.beltPosition ?: run {
             dirty = false
             return
         })
+
         if (diff > 1 / 512f) {
             animate(ctx.partialTick())
         } else {

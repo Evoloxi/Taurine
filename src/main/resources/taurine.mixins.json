@@ -27,7 +27,6 @@
     "gnkinetics.ChainableCogwheelRendererMixin",
     "gnkinetics.GearsBETypesMixin",
     "gnkinetics.accessor.CustomCogWheelBlockAccessor",
-    "minecraft.ItemStackMixin",
     "minecraft.accessor.ItemStackAccessor",
     "vanillin.ItemModelsMixin"
   ],

@@ -28,7 +28,6 @@ class ChainableCogwheelVisual(
             .instancer<RotatingInstance>(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
             .createInstance()
 
-
         shaft.rotateToFace(axis)
             .setup(blockEntity)
             .setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(axis, pos))

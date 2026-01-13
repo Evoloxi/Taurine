@@ -11,7 +11,9 @@ import net.minecraft.resources.ResourceLocation
 import org.joml.Vector4f
 import org.joml.Vector4fc
 import kotlin.math.sqrt
-
+/*
+* Translation of Vanillin's impl
+* */
 object ShadowMesh : QuadMesh {
     private val BOUNDING_SPHERE = Vector4f(0.5F, 0.0F, 0.5F, sqrt(2.0f) * 0.5F)
 
