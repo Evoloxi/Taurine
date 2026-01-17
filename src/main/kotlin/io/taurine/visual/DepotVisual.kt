@@ -12,7 +12,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.transform.TransformStack
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import io.taurine.extension.canBeInstanced
+import io.taurine.ModelCache.canBeInstanced
 import io.taurine.extension.inaccessible.depotBehaviour
 import io.taurine.extension.inaccessible.heldItem
 import io.taurine.extension.inaccessible.incoming

@@ -23,7 +23,6 @@ object Taurine {
 
     @SubscribeEvent
     fun onSetup(event: FMLClientSetupEvent) {
-        MOD_BUS.addListener<EndClientResourceReloadEvent>(ModelCache::reload)
         LOGGER.log(Level.INFO, "Taurine/setup")
     }
 

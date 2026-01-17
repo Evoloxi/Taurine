@@ -12,8 +12,9 @@ import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
-import io.taurine.ModelCache
-import io.taurine.extension.canBeInstanced
+import io.taurine.ModelCache.canBeInstanced
+import io.taurine.extension.inaccessible.capturedFrustum
+import io.taurine.extension.inaccessible.cullingFrustum
 import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
 import net.createmod.ponder.api.level.PonderLevel
@@ -41,7 +42,7 @@ class ExtendedBeltVisual(
     override val dispatcher by dispatcherDelegate // TODO: custom instance types
 
     val shadows = PreservingInstanceRecycler {
-        instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 1).createInstance()
+        instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 10).createInstance()
     }
 
     var relight = true // TODO
@@ -63,7 +64,6 @@ class ExtendedBeltVisual(
         beltSpeed: Float,
         transported: TransportedItemStack,
         pPoseStack: PoseStack
-        //hash: Int
     ) {
         val itemStack = transported.stack
         val bakedModel = ItemModels.getModel(itemStack)
@@ -102,10 +102,6 @@ class ExtendedBeltVisual(
             visualPosition.y.toDouble() + offsetVec.y,
             visualPosition.z.toDouble() + offsetVec.z
         )
-
-        /*if (shouldCullItem(itemPos, level)) { // TODO: move to somwhere else?
-            return
-        }*/
 
         pPoseStack.setIdentity()
         //TransformStack.of(pPoseStack).nudge(transported.angle)
@@ -238,9 +234,7 @@ class ExtendedBeltVisual(
     }
 
     override fun beginFrame(ctx: DynamicVisual.Context) {
-        if (!belt.isController) return
-        if (doDistanceLimitThisFrame(ctx)) return
-
+        if (!belt.isController || doDistanceLimitThisFrame(ctx)) return
         val inv = belt.inventory ?: return
 
         if (!dirty && belt.speed == 0f && !belt.networkDirty) return
@@ -257,14 +251,15 @@ class ExtendedBeltVisual(
             .add(.5, (15 / 16.0), .5)
         val verticality = if (slope == BeltSlope.DOWNWARD) -1 else if (slope == BeltSlope.UPWARD) 1 else 0
         pPoseStack.pushPose()
-        for (stack in inv.transportedItems) {
-            if (stack.stack.canBeInstanced) {
-                if (!dirty && stack.beltPosition == stack.prevBeltPosition && stack.sideOffset == stack.prevSideOffset) { // TODO dynamic aka upright items
-                    val count = Mth.log2(stack.stack.count) / 2 + 1
-                    dispatcher.instances.preserve(stack.stack, count)
+        for (transported in inv.transportedItems) {
+            if (transported.stack.canBeInstanced) {
+                if (!dirty && transported.beltPosition == transported.prevBeltPosition && transported.sideOffset == transported.prevSideOffset) { // TODO dynamic aka upright items
+                    val count = Mth.log2(transported.stack.count) / 2 + 1
+                    dispatcher.instances.preserve(transported.stack, count)
                     shadows.preserve(1)
                     continue
                 }
+
                 animate(
                     ctx.partialTick(),
                     beltFacing,
@@ -275,7 +270,7 @@ class ExtendedBeltVisual(
                     beltStartOffset,
                     belt.beltLength,
                     belt.getSpeed(),
-                    stack,
+                    transported,
                     pPoseStack
                 )
             }
