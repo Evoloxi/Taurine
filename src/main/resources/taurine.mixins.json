@@ -28,7 +28,8 @@
     "gnkinetics.GearsBETypesMixin",
     "gnkinetics.accessor.CustomCogWheelBlockAccessor",
     "minecraft.accessor.ItemStackAccessor",
-    "vanillin.ItemModelsMixin"
+    "vanillin.ItemModelsMixin",
+    "create.BeltVisualMixin"
   ],
   "injectors": {
     "defaultRequire": 1
