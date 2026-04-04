@@ -5,7 +5,6 @@ import com.mojang.math.Axis
 import com.simibubi.create.content.kinetics.belt.*
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
-import com.simibubi.create.foundation.mixin.accessor.LevelRendererAccessor
 import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visual.LightUpdatedVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
@@ -13,11 +12,8 @@ import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
-import io.taurine.extension.inaccessible.capturedFrustum
-import io.taurine.extension.inaccessible.cullingFrustum
 import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
-import net.createmod.ponder.api.level.PonderLevel
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.Direction
@@ -25,9 +21,7 @@ import net.minecraft.core.Vec3i
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.level.Level
 import net.minecraft.world.level.LightLayer
-import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Vector3f

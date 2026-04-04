@@ -4,7 +4,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
-    id 'net.neoforged.moddev' version '2.0.115'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.141'
     id 'org.jetbrains.kotlin.jvm' version '2.2.20'
 }
 
@@ -12,14 +12,14 @@ version = mod_version
 group = mod_group_id
 
 repositories {
-    exclusiveContent { // Non-OI Translucency fix
+    /*exclusiveContent { // Non-OI Translucency fix
         forRepository {
             mavenLocal()
         }
         filter {
             includeModule("dev.engine-room.flywheel", "flywheel-neoforge-1.21.1")
         }
-    }
+    }*/
     maven {
         name = 'Kotlin for Forge'
         url = 'https://thedarkcolour.github.io/KotlinForForge/'
@@ -37,6 +37,8 @@ repositories {
         }
     }
     maven { url = "https://maven.createmod.net" }
+    maven { url = "https://maven.ithundxr.dev/mirror" }
+    maven { url = "https://maven.enjarai.dev/mirrors" }
     maven { url = "https://mvn.devos.one/snapshots" }
     maven {
         url "https://maven.su5ed.dev/releases"
@@ -63,9 +65,9 @@ kotlin {
     jvmToolchain(21)
 }
 
-neoForge {
-    version = project.neo_version
-
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+    validateAccessTransformers = false
     parchment {
         mappingsVersion = project.parchment_mappings_version
         minecraftVersion = project.parchment_minecraft_version
@@ -76,19 +78,19 @@ neoForge {
             client()
             jvmArguments.add('-XX:+AllowEnhancedClassRedefinition')
             programArguments.addAll '--quickPlaySingleplayer', 'New Instance'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
         server {
             server()
             programArgument '--nogui'
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
 
         gameTestServer {
             type = "gameTestServer"
-            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         }
 
         data {
@@ -121,35 +123,35 @@ configurations {
 }
 
 dependencies {
-    implementation 'thedarkcolour:kotlinforforge-neoforge:5.3.0'
-    implementation(jarJar('me.fallenbreath:conditional-mixin-neoforge:0.6.4'))
+    implementation 'thedarkcolour:kotlinforforge:4.12.0'
+    implementation(jarJar('me.fallenbreath:conditional-mixin-forge:0.6.4'))
 
     //compileOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
     //localRuntime "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
-    //implementation files(System.getProperty("user.home") + "/IdeaProjects/Flywheel/neoforge/build/libs/flywheel-neoforge-1.21.1-1.0.4.jar")
-    compileOnly "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:1.0.4"
-    localRuntime "dev.engine-room.flywheel:flywheel-neoforge-1.21.1:1.0.4"
+    implementation "dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"
+    //compileOnly "dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.41sdasdasd"
+    //localRuntime "dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.4asdasd"
 
-    compileOnly "dev.engine-room.vanillin:vanillin-neoforge-${minecraft_version}:${vanillin_version}"
+    compileOnly "dev.engine-room.vanillin:vanillin-forge-${minecraft_version}:${vanillin_version}"
 
-    localRuntime "dev.engine-room.vanillin:vanillin-neoforge-${minecraft_version}:${vanillin_version}"
-    localRuntime 'maven.modrinth:worldedit:7.3.8'
+    localRuntime "dev.engine-room.vanillin:vanillin-forge-${minecraft_version}:${vanillin_version}"
+    //localRuntime 'maven.modrinth:worldedit:7.3.8'
     // # compat
     implementation 'maven.modrinth:gears-n-kinetics:1.0l'
 
-    compileOnly('maven.modrinth:continuity:3.0.0+1.21.neoforge') { transitive = false }
+    compileOnly('maven.modrinth:continuity:3.0.0+1.20.1.forge') { transitive = false }
     compileOnly "org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:3.4.0+acb05a3919"
 
     implementation("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
     implementation "com.tterrag.registrate:Registrate:${registrate_version}"
-    implementation("net.createmod.ponder:Ponder-NeoForge-$minecraft_version:$ponder_version") { transitive = false }
+    implementation("net.createmod.ponder:Ponder-Forge-$minecraft_version:$ponder_version") { transitive = false }
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [minecraft_version      : minecraft_version,
                              minecraft_version_range: minecraft_version_range,
-                             neo_version            : neo_version,
-                             neo_version_range      : neo_version_range,
+                             forge_version          : forge_version,
+                             forge_version_range    : forge_version_range,
                              loader_version_range   : loader_version_range,
                              mod_id                 : mod_id,
                              mod_name               : mod_name,
@@ -170,7 +172,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 }
 
 sourceSets.main.resources.srcDir generateModMetadata
-neoForge.ideSyncTask generateModMetadata
+legacyForge.ideSyncTask generateModMetadata
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {

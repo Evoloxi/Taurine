@@ -24,36 +24,36 @@ config = "${mod_id}.mixins.json"
 #file="META-INF/accesstransformer.cfg"
 
 [[dependencies."${mod_id}"]]
-modId = "neoforge"
-type = "required"
-versionRange = "${neo_version_range}"
+modId = "forge"
+mandatory = true
+versionRange = "${forge_version_range}"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies."${mod_id}"]]
 modId = "minecraft"
-type = "required"
+mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies."${mod_id}"]]
 modId = "vanillin"
-type = "required"
+mandatory = true
 versionRange = "[${vanillin_version},)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies."${mod_id}"]]
 modId = "flywheel"
-type = "required"
+mandatory = true
 versionRange = "[${flywheel_version},)"
 ordering = "NONE"
 side = "CLIENT"
 
 [[dependencies."${mod_id}"]]
 modId = "create"
-type = "required"
+mandatory = true
 versionRange = "[${create_dependency_version},)"
 ordering = "NONE"
 side = "CLIENT"
