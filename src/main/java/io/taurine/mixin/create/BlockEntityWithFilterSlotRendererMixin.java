@@ -21,7 +21,7 @@ public class BlockEntityWithFilterSlotRendererMixin {
                     target = "Lcom/simibubi/create/foundation/blockEntity/behaviour/filtering/FilteringRenderer;renderOnBlockEntity(Lcom/simibubi/create/foundation/blockEntity/SmartBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V"
             )
     )
-    private static void shouldRenderFiltering(SmartBlockEntity instance, float delta, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
+    private void shouldRenderFiltering(SmartBlockEntity instance, float delta, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         // TODO: unsupported item models
     }
 }

@@ -1,14 +1,13 @@
 package io.taurine
 
-import dev.engine_room.flywheel.api.event.EndClientResourceReloadEvent
 import net.minecraft.resources.ResourceLocation
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.Mod
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
+import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+import thedarkcolour.kotlinforforge.forge.MOD_BUS
 
 @Mod(Taurine.ID)
 object Taurine {
@@ -18,7 +17,7 @@ object Taurine {
 
     init {
         LOGGER.log(Level.INFO, "Taurine/init")
-        MOD_BUS.addListener<FMLClientSetupEvent>(this::onSetup)
+        MOD_BUS.addListener(this::onSetup)
     }
 
     @SubscribeEvent

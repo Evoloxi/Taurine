@@ -20,7 +20,7 @@ public abstract class DepotBehaviourMixin extends BlockEntityBehaviour {
     }
 
     @Inject(method = "read", at = @At("TAIL"))
-    void queueUpdate(CompoundTag compound, HolderLookup.Provider registries, boolean clientPacket, CallbackInfo ci) {
+    void queueUpdate(CompoundTag compound, boolean clientPacket, CallbackInfo ci) {
         if (blockEntity instanceof DepotBlockEntity depot) {
             CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> VisualizationHelper.queueUpdate(depot));
         }

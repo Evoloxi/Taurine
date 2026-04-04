@@ -26,7 +26,7 @@ public class AllBlockEntityTypesMixin {
             ),
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;visual(Lcom/tterrag/registrate/util/nullness/NonNullSupplier;Ljava/util/function/Predicate;)Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;",
+                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;visual(Lcom/tterrag/registrate/util/nullness/NonNullSupplier;Lnet/minecraftforge/common/util/NonNullPredicate;)Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;",
                     ordinal = 0
             ),
             index = 0

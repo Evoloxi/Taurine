@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.taurine.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "plugin": "io.taurine.TaurineMixinPlugin",
   "client": [
     "create.AllBlockEntityTypesMixin",
@@ -37,6 +37,6 @@
     "requireAnnotations": true
   },
   "mixinextras": {
-    "minVersion": "0.5.0"
+    "minVersion": "0.5.3"
   }
 }

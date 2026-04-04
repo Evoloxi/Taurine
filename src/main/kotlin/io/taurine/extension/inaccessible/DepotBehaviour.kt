@@ -5,7 +5,7 @@ import com.simibubi.create.content.logistics.depot.DepotBehaviour
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity
 import io.taurine.mixin.create.accessor.DepotBehaviourAccessor
 import io.taurine.mixin.create.accessor.DepotBlockEntityAccessor
-import net.neoforged.neoforge.items.ItemStackHandler
+import net.minecraftforge.items.ItemStackHandler
 
 val DepotBlockEntity.depotBehaviour: DepotBehaviour
     get() = (this as DepotBlockEntityAccessor).depotBehaviour

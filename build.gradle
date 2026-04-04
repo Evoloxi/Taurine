@@ -12,14 +12,15 @@ version = mod_version
 group = mod_group_id
 
 repositories {
-    /*exclusiveContent { // Non-OI Translucency fix
+    exclusiveContent { // Non-OI Translucency fix
         forRepository {
             mavenLocal()
         }
         filter {
             includeModule("dev.engine-room.flywheel", "flywheel-neoforge-1.21.1")
+            includeModule("dev.lopyluna.gnkinetics", "Gears-n-Kinetics")
         }
-    }*/
+    }
     maven {
         name = 'Kotlin for Forge'
         url = 'https://thedarkcolour.github.io/KotlinForForge/'
@@ -115,7 +116,11 @@ legacyForge {
         }
     }
 }
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
 
+    config "${mod_id}.mixins.json"
+}
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 configurations {
@@ -124,27 +129,30 @@ configurations {
 
 dependencies {
     implementation 'thedarkcolour:kotlinforforge:4.12.0'
-    implementation(jarJar('me.fallenbreath:conditional-mixin-forge:0.6.4'))
+    modImplementation(jarJar('me.fallenbreath:conditional-mixin-forge:0.6.4'))
 
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.3"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.3")) {
+        version { strictly "[0.5.3,)" }
+    }
     //compileOnly "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
     //localRuntime "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"
-    implementation "dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"
+    modImplementation "dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"
     //compileOnly "dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.41sdasdasd"
     //localRuntime "dev.engine-room.flywheel:flywheel-forge-1.20.1:1.0.4asdasd"
 
-    compileOnly "dev.engine-room.vanillin:vanillin-forge-${minecraft_version}:${vanillin_version}"
+    modCompileOnly "dev.engine-room.vanillin:vanillin-forge-${minecraft_version}:${vanillin_version}"
 
-    localRuntime "dev.engine-room.vanillin:vanillin-forge-${minecraft_version}:${vanillin_version}"
+    modRuntimeOnly "dev.engine-room.vanillin:vanillin-forge-${minecraft_version}:${vanillin_version}"
     //localRuntime 'maven.modrinth:worldedit:7.3.8'
     // # compat
-    implementation 'maven.modrinth:gears-n-kinetics:1.0l'
+    modImplementation 'dev.lopyluna.gnkinetics:Gears-n-Kinetics:1.0m-forge'
 
-    compileOnly('maven.modrinth:continuity:3.0.0+1.20.1.forge') { transitive = false }
-    compileOnly "org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:3.4.0+acb05a3919"
-
-    implementation("com.simibubi.create:create-${minecraft_version}:${create_version}") { transitive = false }
-    implementation "com.tterrag.registrate:Registrate:${registrate_version}"
-    implementation("net.createmod.ponder:Ponder-Forge-$minecraft_version:$ponder_version") { transitive = false }
+    modCompileOnly('maven.modrinth:continuity:3.0.0+1.20.1.forge') { transitive = false }
+    modCompileOnly "org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:3.4.0+acb05a3919"
+    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:all") { transitive = false }
+    modImplementation "com.tterrag.registrate:Registrate:${registrate_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -174,6 +182,21 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 legacyForge.ideSyncTask generateModMetadata
 
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                "MixinConfigs"            : "${mod_id}.mixins.json",
+                "Specification-Title"     : mod_id,
+                "Specification-Vendor"    : mod_authors,
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : mod_authors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
+    }
+
+    finalizedBy 'reobfJar'
+}
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {
     publications {

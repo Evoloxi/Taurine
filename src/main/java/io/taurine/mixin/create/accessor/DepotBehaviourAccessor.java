@@ -2,7 +2,7 @@ package io.taurine.mixin.create.accessor;
 
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.simibubi.create.content.logistics.depot.DepotBehaviour;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -17,5 +17,5 @@ public interface DepotBehaviourAccessor {
     TransportedItemStack getHeldItem();
 
     @Accessor("processingOutputBuffer")
-    ItemStackHandler getProcessingOutputBuffer();
+   ItemStackHandler getProcessingOutputBuffer();
 }

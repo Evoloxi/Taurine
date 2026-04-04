@@ -33,9 +33,9 @@ import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
-import net.neoforged.neoforge.items.IItemHandlerModifiable
-import net.neoforged.neoforge.items.ItemStackHandler
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions
+import net.minecraftforge.items.IItemHandlerModifiable
+import net.minecraftforge.items.ItemStackHandler
 import java.util.function.Consumer
 import kotlin.math.max
 

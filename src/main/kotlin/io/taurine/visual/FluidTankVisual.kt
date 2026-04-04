@@ -28,7 +28,7 @@ import net.minecraft.core.Direction
 import net.minecraft.util.Mth
 import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.level.LightLayer
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions
 import org.joml.Vector4f
 import org.joml.Vector4fc
 import java.util.function.Consumer
