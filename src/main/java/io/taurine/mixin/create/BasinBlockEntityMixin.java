@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BasinBlockEntity.class)
 public class BasinBlockEntityMixin {
-    @Inject(method = "read", at = @At("TAIL"))
+    /*@Inject(method = "read", at = @At("TAIL"))
     void queueUpdate(CompoundTag compound, boolean clientPacket, CallbackInfo ci) {
         CatnipServices.PLATFORM.executeOnClientOnly(() -> () -> VisualizationHelper.queueUpdate((BasinBlockEntity) (Object) this));
-    }
+    }*/
 }

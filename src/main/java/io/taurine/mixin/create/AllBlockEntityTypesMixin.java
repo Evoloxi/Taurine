@@ -55,7 +55,7 @@ public class AllBlockEntityTypesMixin {
         return instance.visual(() -> DepotVisual::new, true);
     }
 
-    @ModifyReceiver(
+    /*@ModifyReceiver(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=basin")
@@ -71,7 +71,7 @@ public class AllBlockEntityTypesMixin {
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
         return instance.visual(() -> BasinVisual::new, false);
-    }
+    }*/
 
     @ModifyReceiver(
             method = "<clinit>",
