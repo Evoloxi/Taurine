@@ -4,7 +4,7 @@ import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(FluidTankBlockEntity.class)
+@Mixin(value = FluidTankBlockEntity.class, remap = false)
 public interface FluidTankBlockEntityAccessor {
     @Accessor("window")
     boolean getWindow();

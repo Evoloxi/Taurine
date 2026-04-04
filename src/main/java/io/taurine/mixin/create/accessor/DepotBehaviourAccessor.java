@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
-@Mixin(DepotBehaviour.class)
+@Mixin(value = DepotBehaviour.class, remap = false)
 public interface DepotBehaviourAccessor {
     @Accessor("incoming")
     List<TransportedItemStack> getIncoming();

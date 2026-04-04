@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.Iterator;
 import java.util.List;
 
-@Mixin(DepotRenderer.class)
+@Mixin(value = DepotRenderer.class, remap = false)
 public class DepotRendererMixin {
     @Redirect(
             method = "renderItemsOf",

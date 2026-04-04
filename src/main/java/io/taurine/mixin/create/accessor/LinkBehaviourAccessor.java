@@ -6,7 +6,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(LinkBehaviour.class)
+@Mixin(value = LinkBehaviour.class, remap = false)
 public interface LinkBehaviourAccessor {
     @Accessor("firstSlot")
     ValueBoxTransform getFirstSlot();

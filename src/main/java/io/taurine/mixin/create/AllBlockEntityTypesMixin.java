@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 
-@Mixin(AllBlockEntityTypes.class)
+@Mixin(value = AllBlockEntityTypes.class, remap = false)
 public class AllBlockEntityTypesMixin {
     @ModifyArg(
             method = "<clinit>",

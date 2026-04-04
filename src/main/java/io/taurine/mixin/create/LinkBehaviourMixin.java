@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(LinkBehaviour.class)
+@Mixin(value = LinkBehaviour.class, remap = false)
 public abstract class LinkBehaviourMixin extends BlockEntityBehaviour {
     public LinkBehaviourMixin(SmartBlockEntity be) {
         super(be);

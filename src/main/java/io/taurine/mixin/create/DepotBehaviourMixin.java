@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(DepotBehaviour.class)
+@Mixin(value = DepotBehaviour.class, remap = false)
 public abstract class DepotBehaviourMixin extends BlockEntityBehaviour {
     public DepotBehaviourMixin(SmartBlockEntity be) {
         super(be);

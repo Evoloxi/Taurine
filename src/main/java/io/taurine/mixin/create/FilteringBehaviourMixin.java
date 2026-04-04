@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(FilteringBehaviour.class)
+@Mixin(value = FilteringBehaviour.class, remap = false)
 public abstract class FilteringBehaviourMixin extends BlockEntityBehaviour {
     public FilteringBehaviourMixin(SmartBlockEntity be) {
         super(be);

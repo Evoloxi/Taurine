@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 
-@Mixin(GearsBETypes.class)
+@Mixin(value = GearsBETypes.class, remap = false)
 public class GearsBETypesMixin {
     @ModifyReceiver(
             method = "<clinit>",

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Restriction(require = {
         @Condition("continuity")
 })
-@Mixin(ItemModels.class)
+@Mixin(value = ItemModels.class, remap = false)
 public abstract class ItemModelsMixin {
 
     @Unique

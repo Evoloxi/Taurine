@@ -5,7 +5,7 @@ import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(DepotBlockEntity.class)
+@Mixin(value = DepotBlockEntity.class, remap = false)
 public interface DepotBlockEntityAccessor {
     @Accessor("depotBehaviour")
     DepotBehaviour getDepotBehaviour();

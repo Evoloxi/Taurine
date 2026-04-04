@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(SawVisual.class)
+@Mixin(value = SawVisual.class, remap = false)
 public class SawVisualMixin {
     @Unique
     private FilterVisual<SawBlockEntity> taurine$filterVisual;

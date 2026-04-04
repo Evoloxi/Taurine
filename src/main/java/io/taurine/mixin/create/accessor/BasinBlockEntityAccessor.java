@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
-@Mixin(BasinBlockEntity.class)
+@Mixin(value = BasinBlockEntity.class, remap = false)
 public interface BasinBlockEntityAccessor {
     @Accessor("itemCapability")
     LazyOptional<IItemHandlerModifiable> getItemCapability();

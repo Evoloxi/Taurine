@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(FilteringRenderer.class)
+@Mixin(value = FilteringRenderer.class, remap = false)
 public abstract class FilteringRendererMixin {
 
     @Definition(id = "cameraEntity" , local  = @Local(type = Entity.class, name = "cameraEntity"))

@@ -131,6 +131,7 @@ dependencies {
     implementation 'thedarkcolour:kotlinforforge:4.12.0'
     modImplementation(jarJar('me.fallenbreath:conditional-mixin-forge:0.6.4'))
 
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.3"))
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.3")) {
         version { strictly "[0.5.3,)" }

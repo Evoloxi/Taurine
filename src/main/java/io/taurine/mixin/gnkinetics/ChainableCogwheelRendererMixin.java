@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ChainableCogwheelRenderer.class)
+@Mixin(value = ChainableCogwheelRenderer.class, remap = false)
 public abstract class ChainableCogwheelRendererMixin {
     @Shadow
     protected abstract void renderChains(ChainableCogwheelBE be, Direction.Axis axis, PoseStack ms, MultiBufferSource buffer, int light, int overlay);

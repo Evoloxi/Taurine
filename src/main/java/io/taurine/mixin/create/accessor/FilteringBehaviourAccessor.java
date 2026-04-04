@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@Mixin(FilteringBehaviour.class)
+@Mixin(value = FilteringBehaviour.class, remap = false)
 public interface FilteringBehaviourAccessor {
     @Accessor("filter")
     FilterItemStack getFilter();

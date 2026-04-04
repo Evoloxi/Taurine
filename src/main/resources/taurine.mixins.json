@@ -4,6 +4,7 @@
   "package": "io.taurine.mixin",
   "compatibilityLevel": "JAVA_17",
   "plugin": "io.taurine.TaurineMixinPlugin",
+  "refmap": "taurine.refmap.json",
   "client": [
     "create.AllBlockEntityTypesMixin",
     "create.BasinBlockEntityMixin",

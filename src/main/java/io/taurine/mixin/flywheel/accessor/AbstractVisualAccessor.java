@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(AbstractVisual.class)
+@Mixin(value = AbstractVisual.class, remap = false)
 public interface AbstractVisualAccessor {
     @Invoker("instancerProvider")
     InstancerProvider getInstancerProvider();
