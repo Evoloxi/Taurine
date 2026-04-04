@@ -51,7 +51,7 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 kotlin {
     compilerOptions {
         languageVersion.set(KotlinVersion.KOTLIN_2_3)
@@ -63,7 +63,7 @@ kotlin {
                 "-Xallow-holdsin-contract"
         ])
     }
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 legacyForge {
@@ -149,7 +149,7 @@ dependencies {
     modImplementation 'dev.lopyluna.gnkinetics:Gears-n-Kinetics:1.0m-forge'
 
     modCompileOnly('maven.modrinth:continuity:3.0.0+1.20.1.forge') { transitive = false }
-    modCompileOnly "org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:3.4.0+acb05a3919"
+    //modCompileOnly "org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:3.3.0+e3455cb4d1"
     modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
     modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:all") { transitive = false }
     modImplementation "com.tterrag.registrate:Registrate:${registrate_version}"

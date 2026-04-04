@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.filtering.SidedFilte
 import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
+import io.taurine.ModelCache
 import io.taurine.extension.translate
 import net.createmod.catnip.data.Iterate
 import net.minecraft.client.renderer.LightTexture
@@ -53,7 +54,7 @@ class FilterVisual<T : SmartBlockEntity>(
                 val side = slotPositioning.side
                 for (d in Iterate.directions) {
                     val filter: ItemStack = b.getFilter(d)
-                    if (filter.isEmpty) continue
+                    if (filter.isEmpty || !ModelCache.canBeInstanced(filter)) continue
 
                     slotPositioning.fromSide(d)
                     if (!slotPositioning.shouldRender(level, pos, blockState)) continue
@@ -68,7 +69,7 @@ class FilterVisual<T : SmartBlockEntity>(
                 }
                 slotPositioning.fromSide(side)
                 return
-            } else if (slotPositioning.shouldRender(level, pos, blockState)) {
+            } else if (slotPositioning.shouldRender(level, pos, blockState) && ModelCache.canBeInstanced(b.filter)) {
                 ms.pushPose()
                 slotPositioning.transform(level, visualPosition, blockState, ms)
                 renderItemIntoValueBox(b.filter, ms)

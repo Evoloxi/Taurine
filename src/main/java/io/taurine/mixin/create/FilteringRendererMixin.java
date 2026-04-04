@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(FilteringRenderer.class)
 public abstract class FilteringRendererMixin {
 
-    @Definition(id = "cameraEntity", local = @Local(type = Entity.class, name = "cameraEntity"))
-    @Definition(id = "position", method = "Lnet/minecraft/world/entity/Entity;position()Lnet/minecraft/world/phys/Vec3;")
+    @Definition(id = "cameraEntity" , local  = @Local(type = Entity.class, name = "cameraEntity"))
+    @Definition(id = "position"     , method = "Lnet/minecraft/world/entity/Entity;position()Lnet/minecraft/world/phys/Vec3;")
     @Definition(id = "distanceToSqr", method = "Lnet/minecraft/world/phys/Vec3;distanceToSqr(Lnet/minecraft/world/phys/Vec3;)D")
     @Expression("cameraEntity.position().distanceToSqr(?) > ?")
     @ModifyExpressionValue(

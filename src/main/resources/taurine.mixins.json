@@ -13,11 +13,11 @@
     "create.DepotBehaviourMixin",
     "create.DepotRendererMixin",
     "create.FilteringBehaviourMixin",
-    "create.SmartBlockEntityRendererMixin",
     "create.FilteringRendererMixin",
     "create.FluidTankRendererMixin",
     "create.LinkBehaviourMixin",
     "create.SawVisualMixin",
+    "create.SmartBlockEntityRendererMixin",
     "create.accessor.BasinBlockEntityAccessor",
     "create.accessor.DepotBehaviourAccessor",
     "create.accessor.DepotBlockEntityAccessor",
@@ -29,7 +29,9 @@
     "gnkinetics.GearsBETypesMixin",
     "gnkinetics.accessor.CustomCogWheelBlockAccessor",
     "minecraft.accessor.ItemStackAccessor",
-    "vanillin.ItemModelsMixin"
+    "vanillin.BlockColorsAccessor",
+    "vanillin.ItemModelsMixin",
+    "vanillin.compat.continuity.ItemModelsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
