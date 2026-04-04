@@ -32,7 +32,8 @@
     "minecraft.accessor.ItemStackAccessor",
     "vanillin.BlockColorsAccessor",
     "vanillin.ItemModelsMixin",
-    "vanillin.compat.continuity.ItemModelsMixin"
+    "vanillin.compat.continuity.ItemModelsMixin",
+    "create.BeltVisualMixin"
   ],
   "injectors": {
     "defaultRequire": 1

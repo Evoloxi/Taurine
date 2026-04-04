@@ -5,7 +5,6 @@ import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
-import com.simibubi.create.content.processing.basin.BasinBlockEntity;
 import com.simibubi.create.content.redstone.link.RedstoneLinkBlockEntity;
 import com.simibubi.create.foundation.data.CreateBlockEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -19,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(value = AllBlockEntityTypes.class, remap = false)
 public class AllBlockEntityTypesMixin {
-    @ModifyArg(
+    /*@ModifyArg(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=belt")
@@ -34,8 +33,8 @@ public class AllBlockEntityTypesMixin {
     private static <T extends BeltBlockEntity> NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> extendBeltVisual(
             NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> visualFactory
     ) {
-        return () -> ExtendedBeltVisual::new;
-    }
+        return () -> BeltItemLayerVisual::new;
+    }*/
 
     @ModifyReceiver(
             method = "<clinit>",
