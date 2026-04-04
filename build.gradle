@@ -1,11 +1,9 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
-
 plugins {
     id 'java-library'
     id 'maven-publish'
     id 'idea'
     id 'net.neoforged.moddev.legacyforge' version '2.0.141'
-    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.20'
 }
 
 version = mod_version
@@ -54,7 +52,6 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_3)
         freeCompilerArgs.addAll([
                 "-Xdata-flow-based-exhaustiveness",
                 "-Xallow-contracts-on-more-functions",
