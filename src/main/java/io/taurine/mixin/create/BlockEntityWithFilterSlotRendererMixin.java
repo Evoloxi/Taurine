@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
         DeployerRenderer.class
 })
 public class BlockEntityWithFilterSlotRendererMixin {
-    @Redirect(
+    /*@Redirect(
             method = "renderSafe*",
             at = @At(
                     value = "INVOKE",
@@ -23,6 +23,6 @@ public class BlockEntityWithFilterSlotRendererMixin {
     )
     private void shouldRenderFiltering(SmartBlockEntity instance, float delta, PoseStack ms, MultiBufferSource buffer, int light, int overlay) {
         // TODO: unsupported item models
-    }
+    }*/
 }
 

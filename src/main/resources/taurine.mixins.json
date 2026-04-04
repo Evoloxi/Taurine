@@ -13,6 +13,7 @@
     "create.DepotBehaviourMixin",
     "create.DepotRendererMixin",
     "create.FilteringBehaviourMixin",
+    "create.SmartBlockEntityRendererMixin",
     "create.FilteringRendererMixin",
     "create.FluidTankRendererMixin",
     "create.LinkBehaviourMixin",
