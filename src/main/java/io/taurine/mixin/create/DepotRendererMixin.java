@@ -26,7 +26,7 @@ public class DepotRendererMixin {
                     target = "Ljava/util/List;iterator()Ljava/util/Iterator;"
             )
     )
-    private static Iterator<TransportedItemStack> filterLoop(List<TransportedItemStack> instance, @Local(argsOnly = true) SmartBlockEntity be, @Share("taurine$vis") LocalBooleanRef supportsVisualization) {
+    private static Iterator<TransportedItemStack> filterLoop(List<TransportedItemStack> instance, @Local(argsOnly = true) SmartBlockEntity be, @Share("supportsVisualization") LocalBooleanRef supportsVisualization) {
         if (!VisualizationManager.supportsVisualization(be.getLevel())) {
             return instance.iterator();
         }
@@ -40,10 +40,11 @@ public class DepotRendererMixin {
             method = "renderItemsOf",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"
+                    target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z",
+                    remap = true
             )
     )
-    private static boolean asd(boolean original, @Local(name = "stack") ItemStack stack, @Share("taurine$vis") LocalBooleanRef supportsVisualization) {
+    private static boolean asd(boolean original, @Local(name = "stack") ItemStack stack, @Share("supportsVisualization") LocalBooleanRef supportsVisualization) {
         return original || (supportsVisualization.get() && ModelCache.canBeInstanced(stack));
     }
 }
