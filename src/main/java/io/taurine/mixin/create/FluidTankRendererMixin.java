@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = FluidTankRenderer.class, remap = false)
 public class FluidTankRendererMixin {
-    @Inject(
+    /*@Inject(
             method = "renderSafe(Lcom/simibubi/create/content/fluids/tank/FluidTankBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V",
             at = @At(
                     value = "INVOKE",
@@ -23,5 +23,5 @@ public class FluidTankRendererMixin {
     )
     private void cancelAfterBoiler(FluidTankBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay, CallbackInfo ci) {
         if (VisualizationManager.supportsVisualization(be.getLevel())) ci.cancel();
-    }
+    }*/
 }
