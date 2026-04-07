@@ -5,11 +5,10 @@ import com.mojang.math.Axis
 import com.simibubi.create.content.kinetics.belt.*
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
-import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visual.DynamicVisual
+import dev.engine_room.flywheel.api.visual.LightUpdatedVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
-import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
@@ -26,13 +25,12 @@ import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import java.util.function.Consumer
 
-class BeltItemLayerVisual(
+class ExtendedBeltVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
-) : AbstractBlockEntityVisual<BeltBlockEntity>(
+) : BeltVisual(
     ctx, belt, partialTick
-), SimpleDynamicVisual, ItemRendering {
+), SimpleDynamicVisual, LightUpdatedVisual, ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.FIXED
     override val dispatcher by dispatcherDelegate // TODO: custom instance types
@@ -45,6 +43,7 @@ class BeltItemLayerVisual(
     override fun updateLight(partialTick: Float) {
         dirty = true
         relight = true
+        super.updateLight(partialTick)
     }
 
     private fun animate(
@@ -112,8 +111,8 @@ class BeltItemLayerVisual(
 
         val updateLight = dirty || relight || ((
                 (offset * directionVec.x * 10).toInt() +
-                (offset * verticality *    10).toInt() +
-                (offset * directionVec.z * 10).toInt()) % 10 == 0)
+                        (offset * verticality *    10).toInt() +
+                        (offset * directionVec.z * 10).toInt()) % 10 == 0)
 
         val stackLight = if (updateLight) {
             val lightPos = visualPosition.offset(
@@ -225,6 +224,7 @@ class BeltItemLayerVisual(
     var dirty = true
     override fun update(pt: Float) {
         dirty = true
+        super.update(pt)
     }
 
     override fun beginFrame(ctx: DynamicVisual.Context) {
@@ -278,17 +278,10 @@ class BeltItemLayerVisual(
         relight = false
     }
 
-    init {
-        update(partialTick)
-    }
-
     override fun _delete() {
         dispatcher.instances.delete()
         shadows.delete()
-    }
-
-    override fun collectCrumblingInstances(p0: Consumer<Instance?>) {
-
+        super._delete()
     }
 
     companion object {

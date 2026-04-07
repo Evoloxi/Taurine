@@ -7,6 +7,7 @@
   "client": [
     "create.AllBlockEntityTypesMixin",
     "create.BasinBlockEntityMixin",
+    "create.BeltSlicerMixin",
     "create.BeltRendererMixin",
     "create.BlockEntityWithFilterSlotRendererMixin",
     "create.DeployerVisualMixin",
@@ -28,8 +29,7 @@
     "gnkinetics.GearsBETypesMixin",
     "gnkinetics.accessor.CustomCogWheelBlockAccessor",
     "minecraft.accessor.ItemStackAccessor",
-    "vanillin.ItemModelsMixin",
-    "create.BeltVisualMixin"
+    "vanillin.ItemModelsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

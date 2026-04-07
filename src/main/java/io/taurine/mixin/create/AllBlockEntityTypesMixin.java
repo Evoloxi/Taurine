@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(AllBlockEntityTypes.class)
 public class AllBlockEntityTypesMixin {
-    /*@ModifyArg(
+    @ModifyArg(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=belt")
@@ -33,8 +33,8 @@ public class AllBlockEntityTypesMixin {
     private static <T extends BeltBlockEntity> NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> extendBeltVisual(
             NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> visualFactory
     ) {
-        return () -> BeltItemLayerVisual::new;
-    }*/
+        return () -> ExtendedBeltVisual::new;
+    }
 
     @ModifyReceiver(
             method = "<clinit>",

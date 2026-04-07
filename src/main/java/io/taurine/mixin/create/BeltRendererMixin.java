@@ -35,8 +35,8 @@ public class BeltRendererMixin {
             ),
             require = 2
     )
-    boolean filter(BeltRenderer instance, BeltBlockEntity be, float positionVec, PoseStack vectorForOffset, MultiBufferSource diff, int yRot, int renderViewEntity, Direction box, Vec3i v, BeltSlope beltSlope, int i, boolean partialTicks, boolean ms, TransportedItemStack itemStack, Vec3 light) {
-        return !(VisualizationManager.supportsVisualization(be.getLevel()) && ModelCache.canBeInstanced(itemStack.stack));
+    boolean filter(BeltRenderer instance, BeltBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay, Direction beltFacing, Vec3i directionVec, BeltSlope slope, int verticality, boolean slopeAlongX, boolean onContraption, TransportedItemStack transported, Vec3 beltStartOffset) {
+        return !(VisualizationManager.supportsVisualization(be.getLevel()) && ModelCache.canBeInstanced(transported.stack));
     }
 }
 
