@@ -13,8 +13,6 @@ import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
-import io.taurine.extension.inaccessible.capturedFrustum
-import io.taurine.extension.inaccessible.cullingFrustum
 import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
 import net.createmod.ponder.api.level.PonderLevel

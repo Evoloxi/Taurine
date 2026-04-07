@@ -55,7 +55,7 @@ public class AllBlockEntityTypesMixin {
         return instance.visual(() -> DepotVisual::new, true);
     }
 
-    @ModifyReceiver(
+    /*@ModifyReceiver(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=basin")
@@ -71,7 +71,7 @@ public class AllBlockEntityTypesMixin {
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
         return instance.visual(() -> BasinVisual::new, false);
-    }
+    }*/
 
     @ModifyReceiver(
             method = "<clinit>",
@@ -91,7 +91,7 @@ public class AllBlockEntityTypesMixin {
         return instance.visual(() -> LinkVisual::new, false);
     }
 
-    @ModifyReceiver(
+    /*@ModifyReceiver(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=fluid_tank")
@@ -107,5 +107,5 @@ public class AllBlockEntityTypesMixin {
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
         return instance.visual(() -> FluidTankVisual::new, true);
-    }
+    }*/
 }
