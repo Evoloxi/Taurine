@@ -31,9 +31,32 @@ public class DepotRendererMixin {
             return instance.iterator();
         }
         supportsVisualization.set(true);
-        return instance.stream()
-                .filter(t -> !ModelCache.canBeInstanced(t.stack))
-                .iterator();
+
+        return new Iterator<>() {
+            private final Iterator<TransportedItemStack> delegate = instance.iterator();
+            private TransportedItemStack next = advance();
+
+            private TransportedItemStack advance() {
+                while (delegate.hasNext()) {
+                    TransportedItemStack candidate = delegate.next();
+                    if (!ModelCache.canBeInstanced(candidate.stack))
+                        return candidate;
+                }
+                return null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public TransportedItemStack next() {
+                TransportedItemStack result = next;
+                next = advance();
+                return result;
+            }
+        };
     }
 
     @ModifyExpressionValue(
