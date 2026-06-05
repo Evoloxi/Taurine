@@ -18,7 +18,7 @@ object Taurine {
 
     init {
         LOGGER.log(Level.INFO, "Taurine/init")
-        MOD_BUS.addListener<FMLClientSetupEvent>(this::onSetup)
+        MOD_BUS.addListener(this::onSetup)
     }
 
     @SubscribeEvent
