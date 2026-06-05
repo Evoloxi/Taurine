@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'net.neoforged.moddev' version '2.0.115'
-    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.0'
 }
 
 version = mod_version
@@ -51,13 +51,14 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 kotlin {
     compilerOptions {
-        languageVersion.set(KotlinVersion.KOTLIN_2_3)
+        languageVersion.set(KotlinVersion.KOTLIN_2_4)
         freeCompilerArgs.addAll([
-                "-Xdata-flow-based-exhaustiveness",
-                "-Xallow-contracts-on-more-functions",
-                "-Xallow-condition-implies-returns-contracts",
                 "-Xwhen-expressions=indy",
-                "-Xallow-holdsin-contract"
+                "-Xcollection-literals",
+                "-Xintrinsic-const-evaluation",
+                "-Xname-based-destructuring=complete",
+                "-Xnullability-annotations=@org.jetbrains.annotations:strict"
+
         ])
     }
     jvmToolchain(21)
@@ -74,7 +75,10 @@ neoForge {
     runs {
         client {
             client()
-            jvmArguments.add('-XX:+AllowEnhancedClassRedefinition')
+            jvmArguments.addAll(
+                    '-XX:+AllowEnhancedClassRedefinition',
+                    '-XX:+UseCompactObjectHeaders'
+            )
             programArguments.addAll '--quickPlaySingleplayer', 'New Instance'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
