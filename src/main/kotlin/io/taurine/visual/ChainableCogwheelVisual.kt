@@ -25,7 +25,7 @@ class ChainableCogwheelVisual(
         val axis = KineticBlockEntityRenderer.getRotationAxisOf(blockEntity)
 
         shaft = instancerProvider()
-            .instancer<RotatingInstance>(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
+            .instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
             .createInstance()
 
         shaft.rotateToFace(axis)

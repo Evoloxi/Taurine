@@ -33,7 +33,7 @@ class ItemRenderingHelper(
         }
     }
 
-    fun renderItem(ms: PoseStack, item: ItemStack) {
+    fun submitItem(ms: PoseStack, item: ItemStack) {
         instances.get(item).apply {
             setIdentityTransform()
             setTransform(ms)

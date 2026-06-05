@@ -31,7 +31,7 @@ open class CogwheelWithShaftVisual(
         val axis = KineticBlockEntityRenderer.getRotationAxisOf(blockEntity)
 
         additionalShaft =
-            instancerProvider().instancer<RotatingInstance>(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
+            instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
                 .createInstance()
 
 

@@ -102,7 +102,7 @@ class BasinVisual(
                 val vec = VecHelper.offsetRandomly(Vec3.ZERO, r, 1 / 16f)
 
                 ms.translate(vec.x, vec.y, vec.z)
-                dispatcher.renderItem(ms,stack)
+                dispatcher.submitItem(ms,stack)
                 ms.popPose()
             }
             ms.popPose()
@@ -133,7 +133,7 @@ class BasinVisual(
             TransformStack.of(ms).translate(outVec).translate(Vec3(0.0, max(-.55f, -(progress * progress * 2)).toDouble(), 0.0))
                 .translate(directionVec.scale((progress * .5f).toDouble())).rotateYDegrees(AngleHelper.horizontalAngle(direction))
                 .rotateXDegrees(progress * 180)
-            dispatcher.renderItem(ms, intAttached.getValue())
+            dispatcher.submitItem(ms, intAttached.getValue())
             ms.popPose()
         }
     }

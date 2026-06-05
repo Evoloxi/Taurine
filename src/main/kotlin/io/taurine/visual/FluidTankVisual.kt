@@ -61,14 +61,14 @@ object FluidTankMesh {
         return SingleMeshModel(
             TexturedCubeMesh(
                 sprite,
-                listOf(
+                [
                     Direction.NORTH,
                     Direction.SOUTH,
                     Direction.EAST,
                     Direction.WEST,
                     Direction.DOWN,
-                    Direction.UP,
-                )
+                    Direction.UP
+                ]
             ), material(sprite)
         )
     }
