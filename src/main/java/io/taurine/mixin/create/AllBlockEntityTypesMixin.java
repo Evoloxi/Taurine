@@ -2,8 +2,8 @@ package io.taurine.mixin.create;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.simibubi.create.AllBlockEntityTypes;
-import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
+import com.simibubi.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
 import com.simibubi.create.content.redstone.link.RedstoneLinkBlockEntity;
 import com.simibubi.create.foundation.data.CreateBlockEntityBuilder;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(AllBlockEntityTypes.class)
 public class AllBlockEntityTypesMixin {
-    @ModifyArg(
+/*    @ModifyArg(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=belt")
@@ -33,8 +33,8 @@ public class AllBlockEntityTypesMixin {
     private static <T extends BeltBlockEntity> NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> extendBeltVisual(
             NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> visualFactory
     ) {
-        return () -> ExtendedBeltVisual::new;
-    }
+        return () -> BeltItemLayerVisual::new;
+    }*/
 
     @ModifyReceiver(
             method = "<clinit>",
@@ -47,7 +47,7 @@ public class AllBlockEntityTypesMixin {
                     ordinal = 0
             )
     )
-    private static <T extends DepotBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToChainableCogwheel(
+    private static <T extends DepotBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToDepot(
             CreateBlockEntityBuilder<T, R> instance,
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
@@ -83,7 +83,7 @@ public class AllBlockEntityTypesMixin {
                     ordinal = 0
             )
     )
-    private static <T extends RedstoneLinkBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToRedstoneLine(
+    private static <T extends RedstoneLinkBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToRedstoneLink(
             CreateBlockEntityBuilder<T, R> instance,
             NonNullSupplier<T>[] nonNullSuppliers
     ) {

@@ -8,6 +8,6 @@ class TaurineMixinPlugin : RestrictiveMixinConfigPlugin() {
     override fun acceptTargets(myTargets: Set<String>, otherTargets: Set<String>) = Unit
 
     override fun getMixins(): List<String> {
-        return emptyList()
+        return []
     }
 }
