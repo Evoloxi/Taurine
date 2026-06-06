@@ -5,6 +5,7 @@ import com.simibubi.create.AllBlockEntityTypes;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
+import com.simibubi.create.content.processing.basin.BasinBlockEntity;
 import com.simibubi.create.content.redstone.link.RedstoneLinkBlockEntity;
 import com.simibubi.create.foundation.data.CreateBlockEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -54,7 +55,7 @@ public class AllBlockEntityTypesMixin {
         return instance.visual(() -> DepotVisual::new, true);
     }
 
-    /*@ModifyReceiver(
+    @ModifyReceiver(
             method = "<clinit>",
             slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=basin")
@@ -69,8 +70,8 @@ public class AllBlockEntityTypesMixin {
             CreateBlockEntityBuilder<T, R> instance,
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
-        return instance.visual(() -> BasinVisual::new, false);
-    }*/
+        return instance.visual(() -> FilterVisual::new, true);
+    }
 
     @ModifyReceiver(
             method = "<clinit>",

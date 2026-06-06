@@ -7,10 +7,14 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.SidedFilteringBehaviour
 import dev.engine_room.flywheel.api.instance.Instance
+import dev.engine_room.flywheel.api.visual.TickableVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
+import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual
+import io.taurine.ModelCache.canBeInstanced
 import io.taurine.extension.translate
 import net.createmod.catnip.data.Iterate
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
@@ -22,27 +26,22 @@ class FilterVisual<T : SmartBlockEntity>(
     visualizationContext: VisualizationContext, be: T, delta: Float
 ) : AbstractBlockEntityVisual<T>(
     visualizationContext, be, delta
-), ValueBoxVisual {
+), ValueBoxVisual/*, SimpleTickableVisual*/ {
     override val itemDisplayContext = ItemDisplayContext.FIXED
     override val dispatcher by dispatcherDelegate
+    private var previousVisibility = false
+
+/*    override fun tick(context: TickableVisual.Context?) {
+        val visible = ((Minecraft.getInstance().player?.distanceToSqr(visualPosition.center) ?: return) < 16 * 16)
+        dispatcher.instances.applyToAll { setVisible(visible) }
+        previousVisibility = visible
+    }*/
 
     override fun renderOnBlockEntity(ms: PoseStack) {
-        if (blockEntity.isRemoved) return
+        if (blockEntity.isRemoved || previousVisibility) return
 
         for (b in blockEntity.allBehaviours) {
             if (b !is FilteringBehaviour) continue
-
-            // TODO: limit render distance, may be not necessary tho
-            /*if (!be.isVirtual) {
-                val cameraEntity: Entity? = Minecraft.getInstance().cameraEntity
-                if (cameraEntity != null && level == cameraEntity.level()) {
-                    val max = b.renderDistance
-                    if (cameraEntity.position().distanceToSqr(VecHelper.getCenterOf(blockPos)) > max * max) {
-                        continue
-                    }
-                }
-            }*/
-
             if (!b.isActive) continue
             if (b.filter.isEmpty && b !is SidedFilteringBehaviour) continue
 
@@ -53,7 +52,7 @@ class FilterVisual<T : SmartBlockEntity>(
                 val side = slotPositioning.side
                 for (d in Iterate.directions) {
                     val filter: ItemStack = b.getFilter(d)
-                    if (filter.isEmpty) continue
+                    if (filter.isEmpty || !filter.canBeInstanced) continue
 
                     slotPositioning.fromSide(d)
                     if (!slotPositioning.shouldRender(level, pos, blockState)) continue

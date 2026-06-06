@@ -29,6 +29,7 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.util.function.Consumer
+import kotlin.math.ulp
 
 class BeltItemLayerVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
@@ -70,7 +71,7 @@ class BeltItemLayerVisual(
     fun beginFrame(ctx: DynamicVisual.Context) {
         if (!belt.isController || doDistanceLimitThisFrame(ctx)) return
         val inv = belt.inventory ?: return
-        //if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
+        if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
 
         dispatcher.instances.resetCount()
         shadows.resetCount()
@@ -254,16 +255,16 @@ class BeltItemLayerVisual(
         m: Matrix4f, i: Int,
         blockItem: Boolean, renderUpright: Boolean, box: Boolean,
         random: RandomSource
-    ) {
+    ) = m.run {
         if (!blockItem && !renderUpright) {
-            m.translate(0f, -0.09375f, 0f)
-            m.rotate(rotX90)
+            translate(0f, -0.09375f, 0f)
+            rotate(rotX90)
         }
         if (blockItem && !box) {
-            m.translate(random.nextFloat() * 0.0625f * i, 0f, random.nextFloat() * 0.0625f * i)
+            translate(random.nextFloat() * 0.0625f * i, 0f, random.nextFloat() * 0.0625f * i)
         }
         if (box) {
-            m.translate(0f, 0.25f, 0f)
+            translate(0f, 0.25f, 0f)
         }
     }
 

@@ -29,12 +29,12 @@ public abstract class DeployerVisualMixin extends AbstractVisual {
     }
 
     @Inject(method = "tick", at = @At(value = "INVOKE", target = "Ldev/engine_room/flywheel/api/instance/Instancer;stealInstance(Ldev/engine_room/flywheel/api/instance/Instance;)V"))
-    private void onUpdate(TickableVisual.Context context, CallbackInfo ci) {
+    private void onTick(TickableVisual.Context context, CallbackInfo ci) {
         taurine$filterVisual.update(0f);
     }
 
     @Inject(method = "_delete", at = @At("TAIL"))
-    private void onUpdate(CallbackInfo ci) {
+    private void onDelete(CallbackInfo ci) {
         taurine$filterVisual.delete();
     }
 
