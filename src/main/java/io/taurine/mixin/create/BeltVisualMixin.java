@@ -26,7 +26,7 @@ public abstract class BeltVisualMixin extends KineticBlockEntityVisual<BeltBlock
         taurine$itemLayerVisual = new BeltItemLayerVisual(context, blockEntity, partialTick);
     }
 
-    @Inject(method = "updateLight", at = @At("TAIL"))
+    @Inject(method = "updateLight", at = @At("HEAD"))
     private void onUpdateLight(float partialTick, CallbackInfo ci) {
         taurine$itemLayerVisual.updateLight(partialTick);
     }

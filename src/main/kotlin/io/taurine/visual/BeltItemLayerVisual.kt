@@ -17,6 +17,7 @@ import io.taurine.ModelCache.canBeInstanced
 import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
@@ -69,7 +70,7 @@ class BeltItemLayerVisual(
     fun beginFrame(ctx: DynamicVisual.Context) {
         if (!belt.isController || doDistanceLimitThisFrame(ctx)) return
         val inv = belt.inventory ?: return
-        if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
+        //if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
 
         dispatcher.instances.resetCount()
         shadows.resetCount()
@@ -184,7 +185,7 @@ class BeltItemLayerVisual(
 
             dispatcher.instances.get(itemStack).apply {
                 setTransform(itemMatrix)
-                if (packedLight != 0) light(packedLight)
+                if (packedLight != -1) light(packedLight)
                 setChanged()
             }
 
@@ -210,7 +211,7 @@ class BeltItemLayerVisual(
                         (offset * p.directionVec.z * 10).toInt()
                 ) % 10 == 0
 
-        if (!shouldUpdate) return 0
+        if (!shouldUpdate) return -1
 
         val lightPos = visualPosition.offset(
             (p.directionVec.x * offset).toInt(),
