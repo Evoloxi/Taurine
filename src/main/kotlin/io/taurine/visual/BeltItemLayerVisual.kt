@@ -31,7 +31,7 @@ import java.util.function.Consumer
 
 class BeltItemLayerVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
-) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick), SimpleDynamicVisual, LightUpdatedVisual, ItemRendering {
+) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick), ItemRendering {
 
     override val itemDisplayContext = ItemDisplayContext.FIXED
     override val dispatcher by dispatcherDelegate
@@ -56,7 +56,17 @@ class BeltItemLayerVisual(
         dirty = true
     }
 
-    override fun beginFrame(ctx: DynamicVisual.Context) {
+    /**
+     * Called every frame.
+     * <br>
+     * The implementation is free to parallelize calls to this method.
+     * You must ensure proper synchronization if you need to mutate anything outside this visual.
+     * <br>
+     * This method and {@link SimpleTickableVisual#tick} will never be called simultaneously.
+     * <br>
+     * {@link Instancer}/{@link Instance} creation/acquisition is safe here.
+     */
+    fun beginFrame(ctx: DynamicVisual.Context) {
         if (!belt.isController || doDistanceLimitThisFrame(ctx)) return
         val inv = belt.inventory ?: return
         if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
@@ -91,16 +101,14 @@ class BeltItemLayerVisual(
     }
 
     private fun canPreserve(transported: TransportedItemStack): Boolean {
-        if (dirty || relight) return false
-        return transported.beltPosition == transported.prevBeltPosition &&
+        return !(dirty || relight) && transported.beltPosition == transported.prevBeltPosition &&
                 transported.sideOffset == transported.prevSideOffset
     }
 
     private fun hasMovingItems(): Boolean {
         val inv = belt.inventory ?: return false
-        return inv.transportedItems.any { transported ->
-            transported.beltPosition != transported.prevBeltPosition ||
-                    transported.sideOffset != transported.prevSideOffset
+        return inv.transportedItems.any { t ->
+            t.beltPosition != t.prevBeltPosition || t.sideOffset != t.prevSideOffset
         }
     }
 
@@ -197,15 +205,16 @@ class BeltItemLayerVisual(
 
     private fun computeLight(offset: Float, p: BeltParams): Int {
         val shouldUpdate = dirty || relight || (
-                (offset * p.directionVec.x * 10).toInt() +
-                        (offset * p.verticality * 10).toInt() +
-                        (offset * p.directionVec.z * 10).toInt()) % 10 == 0
+                        (offset * p.directionVec.x * 10).toInt() +
+                        (offset * p.verticality    * 10).toInt() +
+                        (offset * p.directionVec.z * 10).toInt()
+                ) % 10 == 0
 
         if (!shouldUpdate) return 0
 
         val lightPos = visualPosition.offset(
             (p.directionVec.x * offset).toInt(),
-            (p.verticality * offset).toInt(),
+            (p.verticality    * offset).toInt(),
             (p.directionVec.z * offset).toInt()
         )
         return LightTexture.pack(
@@ -223,8 +232,8 @@ class BeltItemLayerVisual(
         shadows.get().apply {
             x = sx - 0.2f; y = sy; z = sz - 0.2f
             entityX = sx; entityZ = sz
-            radius = 0.2f; alpha = 0.5f
-            sizeX = 0.4f; sizeZ = 0.4f
+            radius  = 0.2f; alpha = 0.5f
+            sizeX   = 0.4f; sizeZ = 0.4f
             setChanged()
         }
     }
@@ -277,14 +286,14 @@ class BeltItemLayerVisual(
 
     @JvmRecord
     private data class BeltParams(
-        val beltFacing: Direction,
-        val directionVec: Vec3i,
-        val slope: BeltSlope,
-        val slopeAlongX: Boolean,
-        val alongX: Boolean,
-        val verticality: Int,
+        val beltFacing     : Direction,
+        val directionVec   : Vec3i,
+        val slope          : BeltSlope,
+        val slopeAlongX    : Boolean,
+        val alongX         : Boolean,
+        val verticality    : Int,
         val beltStartOffset: Vec3,
-        val beltLength: Int,
+        val beltLength     : Int,
     ) {
         companion object {
             fun from(belt: BeltBlockEntity): BeltParams {
@@ -296,15 +305,16 @@ class BeltItemLayerVisual(
                     else -> 0
                 }
                 return BeltParams(
-                    beltFacing = facing,
-                    directionVec = facing.normal,
-                    slope = slope,
-                    slopeAlongX = facing.axis == Direction.Axis.X,
-                    alongX = facing.clockWise.axis == Direction.Axis.X,
-                    verticality = verticality,
-                    beltStartOffset = Vec3.atLowerCornerOf(facing.normal)
-                        .scale(-.5).add(.5, 15 / 16.0, .5),
-                    beltLength = belt.beltLength,
+                    beltFacing             = facing,
+                    directionVec           = facing.normal,
+                    slope                  = slope,
+                    slopeAlongX            = facing.axis == Direction.Axis.X,
+                    alongX                 = facing.clockWise.axis == Direction.Axis.X,
+                    verticality            = verticality,
+                    beltStartOffset        = Vec3.atLowerCornerOf(facing.normal)
+                                                 .scale(-.5)
+                                                 .add(.5, 15 / 16.0, .5),
+                    beltLength             = belt.beltLength,
                 )
             }
         }
