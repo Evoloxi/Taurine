@@ -7,14 +7,11 @@ import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.SidedFilteringBehaviour
 import dev.engine_room.flywheel.api.instance.Instance
-import dev.engine_room.flywheel.api.visual.TickableVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual
 import io.taurine.ModelCache.canBeInstanced
 import io.taurine.extension.translate
 import net.createmod.catnip.data.Iterate
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
@@ -38,7 +35,7 @@ class FilterVisual<T : SmartBlockEntity>(
     }*/
 
     override fun renderOnBlockEntity(ms: PoseStack) {
-        if (blockEntity.isRemoved || previousVisibility) return
+        if (blockEntity.isRemoved /*|| previousVisibility*/) return
 
         for (b in blockEntity.allBehaviours) {
             if (b !is FilteringBehaviour) continue
@@ -67,7 +64,7 @@ class FilterVisual<T : SmartBlockEntity>(
                 }
                 slotPositioning.fromSide(side)
                 return
-            } else if (slotPositioning.shouldRender(level, pos, blockState)) {
+            } else if (slotPositioning.shouldRender(level, pos, blockState) && b.filter.canBeInstanced) {
                 ms.pushPose()
                 slotPositioning.transform(level, visualPosition, blockState, ms)
                 renderItemIntoValueBox(b.filter, ms)
