@@ -2,41 +2,47 @@ package io.taurine.visual
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import com.simibubi.create.content.kinetics.belt.*
+import com.simibubi.create.content.kinetics.belt.BeltBlock
+import com.simibubi.create.content.kinetics.belt.BeltBlockEntity
+import com.simibubi.create.content.kinetics.belt.BeltHelper
+import com.simibubi.create.content.kinetics.belt.BeltSlope
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
 import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visual.DynamicVisual
-import dev.engine_room.flywheel.api.visual.LightUpdatedVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
+import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
 import io.taurine.flywheel.PreservingInstanceRecycler
+import io.taurine.flywheel.SmartPreservingRecycler
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.util.function.Consumer
-import kotlin.math.ulp
 
 class BeltItemLayerVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
-) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick), ItemRendering {
+) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick) {
 
-    override val itemDisplayContext = ItemDisplayContext.FIXED
-    override val dispatcher by dispatcherDelegate
+    val instances = SmartPreservingRecycler<ItemStack, TransformedInstance> {
+        instancerProvider().instancer(
+            InstanceTypes.TRANSFORMED,
+            ItemModels.get(level, it, ItemDisplayContext.FIXED)
+        ).createInstance()
+    }
 
     val shadows = PreservingInstanceRecycler {
         instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 10).createInstance()
@@ -73,7 +79,7 @@ class BeltItemLayerVisual(
         val inv = belt.inventory ?: return
         if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
 
-        dispatcher.instances.resetCount()
+        instances.resetCount()
         shadows.resetCount()
 
         val beltParams = BeltParams.from(belt)
@@ -86,7 +92,7 @@ class BeltItemLayerVisual(
 
             if (canPreserve(transported)) {
                 val count = Mth.log2(transported.stack.count) / 2 + 1
-                dispatcher.instances.preserve(transported.stack, count)
+                instances.preserve(transported.stack, count)
                 shadows.preserve(1)
                 continue
             }
@@ -95,7 +101,7 @@ class BeltItemLayerVisual(
         }
         ms.popPose()
 
-        dispatcher.instances.discardExtra()
+        instances.discardExtra()
         shadows.discardExtra()
 
         dirty = false
@@ -184,7 +190,7 @@ class BeltItemLayerVisual(
                 scale(scaleValue, scaleValue, scaleValue)
             }
 
-            dispatcher.instances.get(itemStack).apply {
+            instances.get(itemStack).apply {
                 setTransform(itemMatrix)
                 if (packedLight != -1) light(packedLight)
                 setChanged()
@@ -199,9 +205,7 @@ class BeltItemLayerVisual(
 
     private fun computeSlopeAngle(onSlope: Boolean, p: BeltParams): Float {
         if (!onSlope) return 0f
-        val tiltForward = ((p.slope == BeltSlope.DOWNWARD) xor
-                (p.beltFacing.axisDirection == Direction.AxisDirection.POSITIVE)) ==
-                (p.beltFacing.axis == Direction.Axis.Z)
+        val tiltForward = ((p.slope == BeltSlope.DOWNWARD) xor (p.beltFacing.axisDirection == Direction.AxisDirection.POSITIVE)) == (p.beltFacing.axis == Direction.Axis.Z)
         return if (tiltForward) -45f else 45f
     }
 
@@ -278,7 +282,7 @@ class BeltItemLayerVisual(
     }
 
     override fun _delete() {
-        dispatcher.instances.delete()
+        instances.delete()
         shadows.delete()
     }
 
