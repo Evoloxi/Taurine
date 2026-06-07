@@ -88,7 +88,7 @@ public class AllBlockEntityTypesMixin {
             CreateBlockEntityBuilder<T, R> instance,
             NonNullSupplier<T>[] nonNullSuppliers
     ) {
-        return instance.visual(() -> LinkVisual::new, false);
+        return instance.visual(() -> LinkVisual::new, true);
     }
 
     /*@ModifyReceiver(

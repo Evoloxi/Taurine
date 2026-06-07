@@ -40,10 +40,11 @@
     "minVersion": "0.5.0"
   },
   "mixins": [
-    "DeployerBlockEntityMixin",
     "create.BeltVisualMixin",
+    "create.DeployerBlockEntityMixin",
     "create.DeployerRendererMixin",
     "create.DeployerVisualMixin",
-    "create.accessor.DeployerBlockEntityAccessor"
+    "create.accessor.DeployerBlockEntityAccessor",
+    "create.filter_visual.LinkRendererMixin"
   ]
 }

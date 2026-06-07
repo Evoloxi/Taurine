@@ -41,6 +41,8 @@ class LinkVisual<T : SmartBlockEntity>(
             val transform = if (first) behaviour.firstSlot else behaviour.secondSlot
             val stack = if (first) behaviour.frequencyFirst.stack else behaviour.frequencyLast.stack
 
+            if (!stack.canBeInstanced) continue
+
             ms.pushPose()
             transform.transform(level, pos, blockEntity.blockState, ms)
             renderItemIntoValueBox(stack, ms)

@@ -1,4 +1,4 @@
-package io.taurine.mixin;
+package io.taurine.mixin.create;
 
 import com.simibubi.create.content.kinetics.deployer.DeployerBlockEntity;
 import io.taurine.duck.DeployerDuck;
