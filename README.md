@@ -1,6 +1,6 @@
 # Taurine
 
-Changes some of create's block entity renderers to use flyhwheel's instancing capabilities
+Changes some of create's block entity renderers to use flywheel's instancing capabilities
 
 Before[^1]:
 <img width="2560" height="1440" alt="2026-05-26_18 15 28" src="https://github.com/user-attachments/assets/7d52312a-77a5-4797-a2e2-31c7a514f1ab" />

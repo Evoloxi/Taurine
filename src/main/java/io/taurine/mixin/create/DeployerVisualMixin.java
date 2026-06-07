@@ -155,7 +155,7 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
 
     @Unique
     private static final RendererReloadCache<TransformedModelKey, Model> TRANSFORMED_MODEL_CACHE = new RendererReloadCache<>(
-            key -> TransformedMesh.Companion.transformModel(key.model, key.offset, key.scale)
+            key -> TransformedMesh.transformModel(key.model, key.offset, key.scale)
     );
 
     @Unique
