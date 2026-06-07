@@ -5,7 +5,7 @@ import dev.engine_room.flywheel.api.instance.InstanceType
 import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import org.joml.Vector3f
 
-class ConstantMotionInstance(type: InstanceType<out TransformedInstance>, handle: InstanceHandle) : TransformedInstance(type, handle) {
+class ConstantMotionInstance(type: InstanceType<ConstantMotionInstance>, handle: InstanceHandle) : TransformedInstance(type, handle) {
     var mx = 0f
     var my = 0f
     var mz = 0f

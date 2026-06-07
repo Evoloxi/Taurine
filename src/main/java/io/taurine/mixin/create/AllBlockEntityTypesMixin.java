@@ -2,19 +2,16 @@ package io.taurine.mixin.create;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.simibubi.create.AllBlockEntityTypes;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
-import com.simibubi.create.content.kinetics.chainConveyor.ChainConveyorBlockEntity;
+import com.simibubi.create.content.logistics.crate.CreativeCrateBlockEntity;
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinBlockEntity;
 import com.simibubi.create.content.redstone.link.RedstoneLinkBlockEntity;
 import com.simibubi.create.foundation.data.CreateBlockEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import io.taurine.visual.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(AllBlockEntityTypes.class)
@@ -67,6 +64,24 @@ public class AllBlockEntityTypesMixin {
             )
     )
     private static <T extends BasinBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToBasin(
+            CreateBlockEntityBuilder<T, R> instance,
+            NonNullSupplier<T>[] nonNullSuppliers
+    ) {
+        return instance.visual(() -> FilterVisual::new, true);
+    }
+
+    @ModifyReceiver(
+            method = "<clinit>",
+            slice = @Slice(
+                    from = @At(value = "CONSTANT", args = "stringValue=creative_crate")
+            ),
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;validBlocks([Lcom/tterrag/registrate/util/nullness/NonNullSupplier;)Lcom/tterrag/registrate/builders/BlockEntityBuilder;",
+                    ordinal = 0
+            )
+    )
+    private static <T extends CreativeCrateBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToCreativeCrate(
             CreateBlockEntityBuilder<T, R> instance,
             NonNullSupplier<T>[] nonNullSuppliers
     ) {

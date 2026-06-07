@@ -45,6 +45,7 @@
     "create.DeployerRendererMixin",
     "create.DeployerVisualMixin",
     "create.accessor.DeployerBlockEntityAccessor",
+    "create.filter_visual.FunnelVisualMixin",
     "create.filter_visual.LinkRendererMixin"
   ]
 }

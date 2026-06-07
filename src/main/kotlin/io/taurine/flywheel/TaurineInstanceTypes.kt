@@ -5,7 +5,6 @@ import dev.engine_room.flywheel.api.layout.IntegerRepr
 import dev.engine_room.flywheel.api.layout.LayoutBuilder
 import dev.engine_room.flywheel.lib.instance.SimpleInstanceType
 import dev.engine_room.flywheel.lib.util.ExtraMemoryOps
-import dev.engine_room.flywheel.lib.util.ResourceUtil
 import io.taurine.Taurine
 import org.lwjgl.system.MemoryUtil
 

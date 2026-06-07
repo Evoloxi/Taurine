@@ -111,7 +111,7 @@ class BeltItemLayerVisual(
             val stuck = (belt.speed != 0f && (transported.prevBeltPosition - transported.beltPosition) == 0f)
             val posChanged = prev == null ||
                     (stuck != prev.stuck) ||
-                    (transported.prevSideOffset - transported.sideOffset) > 1E-5f ||
+                    (transported.prevSideOffset - transported.sideOffset) > EPSILON ||
                     transported.angle != prev.angle ||
                     transported.stack.count != prev.stackCount ||
                     nearSlopeBoundary
@@ -321,11 +321,11 @@ class BeltItemLayerVisual(
             const val UPDATE_LIGHT = 1 shl 1
             const val ITEM_STUCK = 1 shl 2
 
-            @Suppress("NOTHING_TO_INLINE")
-            inline infix fun Int.has(flag: Int): Boolean {
+            infix fun Int.has(flag: Int): Boolean {
                 return (this and flag) == flag
             }
         }
+        private const val EPSILON = 1E-5f
 
         private val UPRIGHT_CACHE = RendererReloadCache(BeltHelper::isItemUpright)
         private val RANDOM: ThreadLocal<RandomSource> = ThreadLocal.withInitial(RandomSource::createNewThreadLocalInstance)
