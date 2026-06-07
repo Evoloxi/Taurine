@@ -45,7 +45,7 @@ class TransformedMesh(
         }
     }
 
-    override fun indexSequence(): IndexSequence? = original.indexSequence()
+    override fun indexSequence(): IndexSequence = original.indexSequence()
 
     override fun indexCount(): Int = original.indexCount()
 

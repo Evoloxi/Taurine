@@ -19,7 +19,6 @@ import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
 import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual;
 import dev.engine_room.vanillin.item.ItemModels;
 import io.taurine.ModelCache;
-import io.taurine.duck.DeployerDuck;
 import io.taurine.mesh.TransformedMesh;
 import io.taurine.mesh.TransformedModelKey;
 import io.taurine.mixin.create.accessor.DeployerBlockEntityAccessor;
@@ -69,10 +68,10 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void taurine$init(VisualizationContext ctx, DeployerBlockEntity be, float partialTick, CallbackInfo ci) {
-        taurine$punching = ((DeployerDuck) be).taurine$isPunching();
-        taurine$displayMode = taurine$resolveDisplayMode(be);
-        ItemStack heldItem = ((DeployerBlockEntityAccessor) be).getHeldItem();
+    private void taurine$init(VisualizationContext context, DeployerBlockEntity blockEntity, float partialTick, CallbackInfo ci) {
+        taurine$punching = ((DeployerBlockEntityAccessor) blockEntity).taurine$isPunching();
+        taurine$displayMode = taurine$resolveDisplayMode(blockEntity);
+        ItemStack heldItem = ((DeployerBlockEntityAccessor) blockEntity).getHeldItem();
 
         if (!heldItem.isEmpty() && ModelCache.canBeInstanced(heldItem)) {
             taurine$currentHeldItem = heldItem.copy();
@@ -88,7 +87,7 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
     @Inject(method = "tick", at = @At("TAIL"))
     private void taurine$tick(TickableVisual.Context context, CallbackInfo ci) {
         ItemStack heldItem = ((DeployerBlockEntityAccessor) blockEntity).getHeldItem();
-        boolean newPunching = ((DeployerDuck) blockEntity).taurine$isPunching();
+        boolean newPunching = ((DeployerBlockEntityAccessor) blockEntity).taurine$isPunching();
         boolean newDisplayMode = taurine$resolveDisplayMode(blockEntity);
 
         boolean itemChanged = !ItemStack.isSameItemSameComponents(heldItem, taurine$currentHeldItem);
@@ -152,10 +151,10 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
     }
 
     @Unique
-    private final static Vector3f HALF_BLOCK = new Vector3f(0.5f, 0.5f, 0.5f);
+    private static final Vector3f HALF_BLOCK = new Vector3f(0.5f, 0.5f, 0.5f);
 
     @Unique
-    private final static RendererReloadCache<TransformedModelKey, Model> TRANSFORMED_MODEL_CACHE = new RendererReloadCache<>(
+    private static final RendererReloadCache<TransformedModelKey, Model> TRANSFORMED_MODEL_CACHE = new RendererReloadCache<>(
             key -> TransformedMesh.Companion.transformModel(key.model, key.offset, key.scale)
     );
 
@@ -251,6 +250,6 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
 
     @Unique
     private boolean taurine$resolveDisplayMode(DeployerBlockEntity be) {
-        return blockState.getValue(FACING) == Direction.UP && be.getSpeed() == 0 && !((DeployerDuck) be).taurine$isPunching();
+        return blockState.getValue(FACING) == Direction.UP && be.getSpeed() == 0 && !((DeployerBlockEntityAccessor) be).taurine$isPunching();
     }
 }
