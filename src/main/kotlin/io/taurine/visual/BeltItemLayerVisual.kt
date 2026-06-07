@@ -92,7 +92,7 @@ class BeltItemLayerVisual(
             if (!transported.stack.canBeInstanced) continue
 
             if (canPreserve(transported)) {
-                val count = Mth.log2(transported.stack.count) / 2 + 1
+                val count = Mth.log2(transported.stack.count) / 2
                 instances.preserve(transported.stack, count)
                 shadows.preserve(1)
                 continue
