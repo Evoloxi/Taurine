@@ -22,7 +22,6 @@ import io.taurine.flywheel.SmartPreservingRecycler
 import io.taurine.flywheel.TaurineInstanceTypes
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
-import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.core.Direction
 import net.minecraft.util.Mth
@@ -32,7 +31,6 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 import org.joml.Vector4f
 import org.joml.Vector4fc
 import java.util.function.Consumer
-import kotlin.math.min
 
 @JvmRecord
 data class FaceData(
@@ -89,6 +87,7 @@ private fun Boolean.toFloat(): Float {
     return if (this) 1f else 0f
 }
 
+/*
 class FluidTankVisual<T: FluidTankBlockEntity>(
     visualizationContext: VisualizationContext,
     be: T,
@@ -99,13 +98,13 @@ visualizationContext, be, delta
 
     val sides = SmartPreservingRecycler<TextureAtlasSprite, ScalingFluidInstance> {
         visualizationContext.instancerProvider().instancer(
-            TaurineInstanceTypes.SCALING_FLUID,
+            TaurineInstanceTypes.CONSTANT_MOTION,
             FluidTankMesh.tube(it)
         ).createInstance()
     }
     val top = SmartPreservingRecycler<TextureAtlasSprite, ScalingFluidInstance> {
         visualizationContext.instancerProvider().instancer(
-            TaurineInstanceTypes.SCALING_FLUID,
+            TaurineInstanceTypes.CONSTANT_MOTION,
             FluidMesh.surface(it, 1f)
         ).createInstance()
     }
@@ -217,4 +216,4 @@ visualizationContext, be, delta
     override fun beginFrame(ctx: DynamicVisual.Context) {
         update(ctx.partialTick())
     }
-}
+}*/

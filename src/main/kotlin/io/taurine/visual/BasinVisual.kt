@@ -39,6 +39,7 @@ import net.neoforged.neoforge.items.ItemStackHandler
 import java.util.function.Consumer
 import kotlin.math.max
 
+/*
 class BasinVisual(
     visualizationContext: VisualizationContext, be: BasinBlockEntity, delta: Float
 ) : AbstractBlockEntityVisual<BasinBlockEntity>(
@@ -52,7 +53,7 @@ class BasinVisual(
 
     val fluidInstances = SmartPreservingRecycler<TextureAtlasSprite, ScalingFluidInstance> {
         visualizationContext.instancerProvider().instancer(
-            TaurineInstanceTypes.SCALING_FLUID,
+            TaurineInstanceTypes.CONSTANT_MOTION,
             FluidMesh.surface(it, 12f / 16f)
         ).createInstance()
     }
@@ -270,4 +271,4 @@ class BasinVisual(
     override fun collectCrumblingInstances(p0: Consumer<Instance?>?) {
 
     }
-}
+}*/
