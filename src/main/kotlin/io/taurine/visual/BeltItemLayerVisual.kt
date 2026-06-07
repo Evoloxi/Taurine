@@ -51,7 +51,7 @@ class BeltItemLayerVisual(
         val packedLight: Int,
     )
 
-    private val knownState = Reference2ObjectOpenHashMap<TransportedItemStack, ItemState>()
+    private val knownState = Reference2ObjectOpenHashMap<TransportedItemStack, ItemState>(8)
 
     private val instances = SmartPreservingRecycler<ItemStack, ConstantMotionInstance> {
         instancerProvider().instancer(
@@ -109,20 +109,21 @@ class BeltItemLayerVisual(
                 minOf(distToEntry, distToExit) < tickDelta * 2
             }
             val stuck = (belt.speed != 0f && (transported.prevBeltPosition - transported.beltPosition) == 0f)
-            val posChanged = prev == null ||
+
+            val motionChanged = prev == null ||
                     (stuck != prev.stuck) ||
-                    (transported.prevSideOffset - transported.sideOffset) > EPSILON ||
+                    ((transported.prevSideOffset - transported.sideOffset) * belt.speed > EPSILON) ||
                     transported.angle != prev.angle ||
                     transported.stack.count != prev.stackCount ||
                     nearSlopeBoundary
 
             val lightChanged = prev == null || lightPos != prev.lightBlock
 
-            val needsWrite = needsFullRebuild || posChanged
+            val needsWrite = needsFullRebuild || motionChanged
 
             val count = Mth.log2(transported.stack.count) / 2
 
-            if (needsWrite || (needsRelight && lightChanged)) {
+            if (needsWrite || (needsRelight || lightChanged)) {
                 var flags = 0
                 if (needsWrite)                   flags = flags or Flags.UPDATE_TRANSFORM
                 if (lightChanged || needsRelight) flags = flags or Flags.UPDATE_LIGHT

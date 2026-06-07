@@ -2,6 +2,8 @@ package io.taurine.mixin.create;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.simibubi.create.AllBlockEntityTypes;
+import com.simibubi.create.content.fluids.pipes.SmartFluidPipeBlockEntity;
+import com.simibubi.create.content.logistics.chute.SmartChuteBlockEntity;
 import com.simibubi.create.content.logistics.crate.CreativeCrateBlockEntity;
 import com.simibubi.create.content.logistics.depot.DepotBlockEntity;
 import com.simibubi.create.content.processing.basin.BasinBlockEntity;
@@ -16,23 +18,6 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(AllBlockEntityTypes.class)
 public class AllBlockEntityTypesMixin {
-/*    @ModifyArg(
-            method = "<clinit>",
-            slice = @Slice(
-                    from = @At(value = "CONSTANT", args = "stringValue=belt")
-            ),
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;visual(Lcom/tterrag/registrate/util/nullness/NonNullSupplier;Ljava/util/function/Predicate;)Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;",
-                    ordinal = 0
-            ),
-            index = 0
-    )
-    private static <T extends BeltBlockEntity> NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> extendBeltVisual(
-            NonNullSupplier<SimpleBlockEntityVisualizer.Factory<T>> visualFactory
-    ) {
-        return () -> BeltItemLayerVisual::new;
-    }*/
 
     @ModifyReceiver(
             method = "<clinit>",
@@ -91,6 +76,42 @@ public class AllBlockEntityTypesMixin {
     @ModifyReceiver(
             method = "<clinit>",
             slice = @Slice(
+                    from = @At(value = "CONSTANT", args = "stringValue=smart_chute")
+            ),
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;validBlocks([Lcom/tterrag/registrate/util/nullness/NonNullSupplier;)Lcom/tterrag/registrate/builders/BlockEntityBuilder;",
+                    ordinal = 0
+            )
+    )
+    private static <T extends SmartChuteBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToSmartChute(
+            CreateBlockEntityBuilder<T, R> instance,
+            NonNullSupplier<T>[] nonNullSuppliers
+    ) {
+        return instance.visual(() -> FilterVisual::new, false);
+    }
+
+    @ModifyReceiver(
+            method = "<clinit>",
+            slice = @Slice(
+                    from = @At(value = "CONSTANT", args = "stringValue=smart_fluid_pipe")
+            ),
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;validBlocks([Lcom/tterrag/registrate/util/nullness/NonNullSupplier;)Lcom/tterrag/registrate/builders/BlockEntityBuilder;",
+                    ordinal = 0
+            )
+    )
+    private static <T extends SmartFluidPipeBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToSmartFluidPipe(
+            CreateBlockEntityBuilder<T, R> instance,
+            NonNullSupplier<T>[] nonNullSuppliers
+    ) {
+        return instance.visual(() -> FilterVisual::new, false);
+    }
+
+    @ModifyReceiver(
+            method = "<clinit>",
+            slice = @Slice(
                     from = @At(value = "CONSTANT", args = "stringValue=redstone_link")
             ),
             at = @At(
@@ -105,22 +126,4 @@ public class AllBlockEntityTypesMixin {
     ) {
         return instance.visual(() -> LinkVisual::new, true);
     }
-
-    /*@ModifyReceiver(
-            method = "<clinit>",
-            slice = @Slice(
-                    from = @At(value = "CONSTANT", args = "stringValue=fluid_tank")
-            ),
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lcom/simibubi/create/foundation/data/CreateBlockEntityBuilder;validBlocks([Lcom/tterrag/registrate/util/nullness/NonNullSupplier;)Lcom/tterrag/registrate/builders/BlockEntityBuilder;",
-                    ordinal = 0
-            )
-    )
-    private static <T extends FluidTankBlockEntity, R extends CreateRegistrate> CreateBlockEntityBuilder<T, R> addVisualToFluidTank(
-            CreateBlockEntityBuilder<T, R> instance,
-            NonNullSupplier<T>[] nonNullSuppliers
-    ) {
-        return instance.visual(() -> FluidTankVisual::new, true);
-    }*/
 }

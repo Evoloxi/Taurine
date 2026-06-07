@@ -6,7 +6,9 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringRenderer;
+import dev.engine_room.flywheel.api.visualization.VisualizationManager;
 import io.taurine.ModelCache;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -19,8 +21,8 @@ public abstract class FilteringRendererMixin {
             method = "renderOnBlockEntity",
             at = @At(value = "MIXINEXTRAS:EXPRESSION")
     )
-    private static boolean behaviour(boolean original, @Local(name = "behaviour") FilteringBehaviour behaviour) {
-        return original || ModelCache.canBeInstanced(behaviour.getFilter());
+    private static boolean behaviour(boolean original, @Local(name = "level") Level level, @Local(name = "behaviour") FilteringBehaviour behaviour) {
+        return original || (VisualizationManager.supportsVisualization(level) && ModelCache.canBeInstanced(behaviour.getFilter()));
     }
 }
 
