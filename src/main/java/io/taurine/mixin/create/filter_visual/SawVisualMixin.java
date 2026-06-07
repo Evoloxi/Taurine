@@ -1,4 +1,4 @@
-package io.taurine.mixin.create;
+package io.taurine.mixin.create.filter_visual;
 
 import com.simibubi.create.content.kinetics.saw.SawBlockEntity;
 import com.simibubi.create.content.kinetics.saw.SawVisual;

@@ -9,21 +9,20 @@
     "create.BasinBlockEntityMixin",
     "create.BeltRendererMixin",
     "create.BeltSlicerMixin",
-    "create.BlockEntityWithFilterSlotRendererMixin",
-    "create.DeployerVisualMixin",
     "create.DepotBehaviourMixin",
     "create.DepotRendererMixin",
-    "create.FilteringBehaviourMixin",
-    "create.FilteringRendererMixin",
     "create.FluidTankRendererMixin",
-    "create.LinkBehaviourMixin",
-    "create.SawVisualMixin",
     "create.accessor.BasinBlockEntityAccessor",
     "create.accessor.DepotBehaviourAccessor",
     "create.accessor.DepotBlockEntityAccessor",
     "create.accessor.FilteringBehaviourAccessor",
     "create.accessor.FluidTankBlockEntityAccessor",
     "create.accessor.LinkBehaviourAccessor",
+    "create.filter_visual.DeployerVisualMixin",
+    "create.filter_visual.FilteringBehaviourMixin",
+    "create.filter_visual.FilteringRendererMixin",
+    "create.filter_visual.LinkBehaviourMixin",
+    "create.filter_visual.SawVisualMixin",
     "flywheel.accessor.AbstractVisualAccessor",
     "gnkinetics.ChainableCogwheelRendererMixin",
     "gnkinetics.GearsBETypesMixin",
@@ -41,6 +40,10 @@
     "minVersion": "0.5.0"
   },
   "mixins": [
-    "create.BeltVisualMixin"
+    "DeployerBlockEntityMixin",
+    "create.BeltVisualMixin",
+    "create.DeployerRendererMixin",
+    "create.DeployerVisualMixin",
+    "create.accessor.DeployerBlockEntityAccessor"
   ]
 }

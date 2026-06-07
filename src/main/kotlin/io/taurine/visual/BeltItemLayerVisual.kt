@@ -13,6 +13,7 @@ import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.instance.TransformedInstance
+import dev.engine_room.flywheel.lib.util.RendererReloadCache
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
@@ -76,8 +77,7 @@ class BeltItemLayerVisual(
      */
     fun beginFrame(ctx: DynamicVisual.Context) {
         if (!belt.isController || doDistanceLimitThisFrame(ctx)) return
-        val inv = belt.inventory ?: return
-        if (!dirty && belt.speed == 0f && !belt.networkDirty && !hasMovingItems()) return // TODO: dynamic/upright items
+        if (!dirty && belt.speed == 0f && !belt.networkDirty) return // TODO: dynamic/upright items
 
         instances.resetCount()
         shadows.resetCount()
@@ -85,6 +85,7 @@ class BeltItemLayerVisual(
         val beltParams = BeltParams.from(belt)
         val pt = ctx.partialTick()
         val ms = PoseStack()
+        val inv = belt.inventory ?: return
 
         ms.pushPose()
         for (transported in inv.transportedItems) {
@@ -113,10 +114,10 @@ class BeltItemLayerVisual(
                 transported.sideOffset == transported.prevSideOffset
     }
 
-    private fun hasMovingItems(): Boolean {
+    private fun hasDynamicItems(): Boolean {
         val inv = belt.inventory ?: return false
         return inv.transportedItems.any { t ->
-            t.beltPosition != t.prevBeltPosition || t.sideOffset != t.prevSideOffset
+            UPRIGHT_CACHE.get(t.stack)
         }
     }
 
@@ -161,7 +162,7 @@ class BeltItemLayerVisual(
 
         val packedLight = computeLight(offset, p)
 
-        val renderUpright = BeltHelper.isItemUpright(itemStack)
+        val renderUpright = UPRIGHT_CACHE.get(itemStack)
         val bakedModel = ItemModels.getModel(itemStack)
         val blockItem = bakedModel.isGui3d
         val box = PackageItem.isPackage(itemStack)
@@ -177,7 +178,7 @@ class BeltItemLayerVisual(
         placeShadow(ms, onSlope)
 
         if (renderUpright) {
-            orientUprightItem(ms, offset)
+            orientUprightItem(ms, offset, pt)
         }
 
         val rotYAngle = Axis.YP.rotationDegrees(transported.angle.toFloat())
@@ -244,9 +245,9 @@ class BeltItemLayerVisual(
         }
     }
 
-    private fun orientUprightItem(ms: PoseStack, offset: Float) {
+    private fun orientUprightItem(ms: PoseStack, offset: Float, pt: Float) {
         mc.cameraEntity?.let { renderViewEntity ->
-            val positionVec = renderViewEntity.position()
+            val positionVec = renderViewEntity.getPosition(pt)
             val vectorForOffset = BeltHelper.getVectorForOffset(belt, offset)
             val diff = vectorForOffset.subtract(positionVec)
             val yRot = Mth.atan2(diff.x, diff.z).toFloat() + Math.PI.toFloat()
@@ -327,6 +328,7 @@ class BeltItemLayerVisual(
     }
 
     companion object {
+        private val UPRIGHT_CACHE = RendererReloadCache(BeltHelper::isItemUpright)
         private val RANDOM: ThreadLocal<RandomSource> =
             ThreadLocal.withInitial(RandomSource::createNewThreadLocalInstance)
         private val rotX90 = Axis.XP.rotationDegrees(90f)

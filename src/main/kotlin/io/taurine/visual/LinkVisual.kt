@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity
 import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
+import io.taurine.ModelCache.canBeInstanced
 import io.taurine.extension.inaccessible.firstSlot
 import io.taurine.extension.inaccessible.frequencyFirst
 import io.taurine.extension.inaccessible.frequencyLast
