@@ -3,8 +3,9 @@ package io.taurine.mixin.create;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityVisual;
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.belt.BeltVisual;
+import dev.engine_room.flywheel.api.visual.TickableVisual;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
-import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
+import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual;
 import io.taurine.visual.BeltItemLayerVisual;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BeltVisual.class)
-public abstract class BeltVisualMixin extends KineticBlockEntityVisual<BeltBlockEntity> implements SimpleDynamicVisual {
+public abstract class BeltVisualMixin extends KineticBlockEntityVisual<BeltBlockEntity> implements SimpleTickableVisual {
     @Unique
     private BeltItemLayerVisual taurine$itemLayerVisual;
 
@@ -42,7 +43,7 @@ public abstract class BeltVisualMixin extends KineticBlockEntityVisual<BeltBlock
     }
 
     @Override
-    public void beginFrame(Context context) {
-        taurine$itemLayerVisual.beginFrame(context);
+    public void tick(TickableVisual.Context context) {
+        taurine$itemLayerVisual.tick(context);
     }
 }

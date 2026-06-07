@@ -2,143 +2,173 @@ package io.taurine.visual
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import com.simibubi.create.content.kinetics.belt.BeltBlock
 import com.simibubi.create.content.kinetics.belt.BeltBlockEntity
 import com.simibubi.create.content.kinetics.belt.BeltHelper
 import com.simibubi.create.content.kinetics.belt.BeltSlope
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
 import dev.engine_room.flywheel.api.instance.Instance
-import dev.engine_room.flywheel.api.visual.DynamicVisual
+import dev.engine_room.flywheel.api.visual.TickableVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
+import dev.engine_room.flywheel.backend.mixin.LevelRendererAccessor
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
-import dev.engine_room.flywheel.lib.instance.TransformedInstance
 import dev.engine_room.flywheel.lib.util.RendererReloadCache
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
+import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
+import io.taurine.flywheel.ConstantMotionInstance
 import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.flywheel.SmartPreservingRecycler
+import io.taurine.flywheel.TaurineInstanceTypes
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
+import io.taurine.visual.BeltItemLayerVisual.Companion.Flags.has
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture
+import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
-import net.minecraft.core.Vec3i
 import net.minecraft.util.Mth
 import net.minecraft.util.RandomSource
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer
-import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.util.function.Consumer
+import kotlin.math.abs
 
 class BeltItemLayerVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
-) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick) {
+) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick), SimpleTickableVisual {
 
-    val instances = SmartPreservingRecycler<ItemStack, TransformedInstance> {
+    private data class ItemState(
+        val stuck: Boolean,
+        val angle: Int,
+        val stackCount: Int,
+        val lightBlock: BlockPos,
+        val packedLight: Int,
+    )
+
+    private val knownState = Reference2ObjectOpenHashMap<TransportedItemStack, ItemState>()
+
+    private val instances = SmartPreservingRecycler<ItemStack, ConstantMotionInstance> {
         instancerProvider().instancer(
-            InstanceTypes.TRANSFORMED,
+            TaurineInstanceTypes.CONSTANT_MOTION,
             ItemModels.get(level, it, ItemDisplayContext.FIXED)
         ).createInstance()
     }
 
-    val shadows = PreservingInstanceRecycler {
+    private val shadows = PreservingInstanceRecycler {
         instancerProvider().instancer(InstanceTypes.SHADOW, SHADOW_MODEL, 10).createInstance()
     }
 
-    private var dirty = true
-    private var relight = true
+    private var needsFullRebuild = true
+    private var needsRelight = true
 
     override fun updateLight(partialTick: Float) {
-        dirty = true
-        relight = true
+        needsRelight = true
     }
 
-    init {
-        update(partialTick)
-    }
+    init { update(partialTick) }
 
     override fun update(pt: Float) {
-        dirty = true
+        needsFullRebuild = true
     }
 
-    /**
-     * Called every frame.
-     * <br>
-     * The implementation is free to parallelize calls to this method.
-     * You must ensure proper synchronization if you need to mutate anything outside this visual.
-     * <br>
-     * This method and {@link SimpleTickableVisual#tick} will never be called simultaneously.
-     * <br>
-     * {@link Instancer}/{@link Instance} creation/acquisition is safe here.
-     */
-    fun beginFrame(ctx: DynamicVisual.Context) {
-        if (!belt.isController || doDistanceLimitThisFrame(ctx)) return
-        if (!dirty && belt.speed == 0f && !belt.networkDirty) return // TODO: dynamic/upright items
+    override fun tick(context: TickableVisual.Context) {
+        if (!belt.isController) return
+        val inv = belt.inventory ?: return
+
+        val beltParams = BeltParams.from(belt)
+        val ticks = (Minecraft.getInstance().levelRenderer as LevelRendererAccessor).`flywheel$getTicks`().toFloat()
+
+        if (knownState.size > inv.transportedItems.size) {
+            val current = ReferenceOpenHashSet(inv.transportedItems)
+            knownState.keys.retainAll(current)
+        }
 
         instances.resetCount()
         shadows.resetCount()
 
-        val beltParams = BeltParams.from(belt)
-        val pt = ctx.partialTick()
-        val ms = PoseStack()
-        val inv = belt.inventory ?: return
-
-        ms.pushPose()
         for (transported in inv.transportedItems) {
             if (!transported.stack.canBeInstanced) continue
 
-            if (canPreserve(transported)) {
-                val count = Mth.log2(transported.stack.count) / 2
-                instances.preserve(transported.stack, count)
-                shadows.preserve(1)
-                continue
-            }
+            val lightPos = lightPosFor(transported.beltPosition, beltParams)
+            val packedLight = LightTexture.pack(
+                level.getBrightness(LightLayer.BLOCK, lightPos),
+                level.getBrightness(LightLayer.SKY, lightPos)
+            )
 
-            renderTransported(pt, beltParams, transported, ms)
+            val prev = knownState[transported]
+            val nearSlopeBoundary = beltParams.slope != BeltSlope.HORIZONTAL && run {
+                val tickDelta = abs(belt.speed) / 24f
+                val distToEntry = abs(transported.beltPosition - 0.5f)
+                val distToExit = abs(transported.beltPosition - (beltParams.beltLength - 0.5f))
+                minOf(distToEntry, distToExit) < tickDelta * 2
+            }
+            val stuck = (belt.speed != 0f && (transported.prevBeltPosition - transported.beltPosition) == 0f)
+            val posChanged = prev == null ||
+                    (stuck != prev.stuck) ||
+                    (transported.prevSideOffset - transported.sideOffset) > 1E-5f ||
+                    transported.angle != prev.angle ||
+                    transported.stack.count != prev.stackCount ||
+                    nearSlopeBoundary
+
+            val lightChanged = prev == null || lightPos != prev.lightBlock
+
+            val needsWrite = needsFullRebuild || posChanged
+
+            val count = Mth.log2(transported.stack.count) / 2
+
+            if (needsWrite || (needsRelight && lightChanged)) {
+                var flags = 0
+                if (needsWrite)                   flags = flags or Flags.UPDATE_TRANSFORM
+                if (lightChanged || needsRelight) flags = flags or Flags.UPDATE_LIGHT
+                if (stuck)                        flags = flags or Flags.ITEM_STUCK
+
+                writeInstances(transported, beltParams, ticks, packedLight, flags)
+                knownState[transported] = ItemState(
+                    stuck = stuck,
+                    angle = transported.angle,
+                    stackCount = transported.stack.count,
+                    lightBlock = lightPos,
+                    packedLight = packedLight,
+                )
+            } else {
+                instances.preserve(transported.stack, count + 1)
+                shadows.preserve(1)
+            }
         }
-        ms.popPose()
 
         instances.discardExtra()
         shadows.discardExtra()
 
-        dirty = false
-        relight = false
+        needsFullRebuild = false
+        needsRelight = false
+        belt.networkDirty = false
     }
 
-    private fun canPreserve(transported: TransportedItemStack): Boolean {
-        return !(dirty || relight) && transported.beltPosition == transported.prevBeltPosition &&
-                transported.sideOffset == transported.prevSideOffset
-    }
-
-    private fun hasDynamicItems(): Boolean {
-        val inv = belt.inventory ?: return false
-        return inv.transportedItems.any { t ->
-            UPRIGHT_CACHE.get(t.stack)
-        }
-    }
-
-    private fun renderTransported(
-        pt: Float,
-        p: BeltParams,
+    private fun writeInstances(
         transported: TransportedItemStack,
-        ms: PoseStack
+        p: BeltParams,
+        renderTicks: Float,
+        packedLight: Int,
+        flags: Int
     ) {
-        val itemStack = transported.stack
+        val stack = transported.stack
         val random = RANDOM.get().also { it.setSeed(transported.angle.toLong()) }
 
-        val offset = lerpIfMoving(pt, transported.prevBeltPosition, transported.beltPosition)
-        val sideOffset = lerpIfMoving(pt, transported.prevSideOffset, transported.sideOffset)
+        val offset = transported.beltPosition
+        val sideOffset = transported.sideOffset
 
-        val verticalMovement = if (offset < 0.5f) 0f else
-            p.verticality * (Mth.clamp(offset, 0.5f, p.beltLength - 0.5f) - 0.5f)
+        val verticalMovement = if (offset < 0.5f) 0f
+        else p.verticality * (Mth.clamp(offset, 0.5f, p.beltLength - 0.5f) - 0.5f)
 
-        val offsetVec = Vector3f(p.directionVec.x.toFloat(), p.directionVec.y.toFloat(), p.directionVec.z.toFloat())
+        val offsetVec = Vector3f(p.directionVec.x.toFloat(), 0f, p.directionVec.z.toFloat())
             .mul(offset)
-            .also { if (verticalMovement != 0f) it.add(0f, verticalMovement, 0f) }
+            .add(0f, verticalMovement, 0f)
 
         val onSlope = p.slope != BeltSlope.HORIZONTAL &&
                 Mth.clamp(offset, 0.5f, p.beltLength - 0.5f) == offset
@@ -151,6 +181,7 @@ class BeltItemLayerVisual(
             (visualPosition.z + offsetVec.z).toDouble()
         )
 
+        val ms = PoseStack()
         ms.setIdentity()
 
         val adjustedSideOffset = if (p.alongX) +sideOffset else -sideOffset
@@ -160,78 +191,65 @@ class BeltItemLayerVisual(
             itemPos.z + if (!p.alongX) adjustedSideOffset else 0f
         )
 
-        val packedLight = computeLight(offset, p)
-
-        val renderUpright = UPRIGHT_CACHE.get(itemStack)
-        val bakedModel = ItemModels.getModel(itemStack)
+        val renderUpright = UPRIGHT_CACHE.get(stack)
+        val bakedModel = ItemModels.getModel(stack)
         val blockItem = bakedModel.isGui3d
-        val box = PackageItem.isPackage(itemStack)
-        val count = Mth.log2(itemStack.count) / 2
+        val box = PackageItem.isPackage(stack)
+        val count = Mth.log2(stack.count) / 2
         val scaleValue = if (box) 1.5f else 0.5f
 
         if (!renderUpright) {
             ms.mulPose((if (p.slopeAlongX) Axis.ZP else Axis.XP).rotationDegrees(slopeAngle))
         }
-
         if (onSlope) ms.translate(0f, SLOPE_OFFSET, 0f)
 
-        placeShadow(ms, onSlope)
+        if (!onSlope) placeShadow(ms)
 
-        if (renderUpright) {
-            orientUprightItem(ms, offset, pt)
-        }
+        if (renderUpright) orientUprightItem(ms, offset)
 
         val rotYAngle = Axis.YP.rotationDegrees(transported.angle.toFloat())
         val baseMatrix = ms.last().pose()
 
+        val motion = if (flags has Flags.ITEM_STUCK) {
+            Vector3f()
+        } else {
+            Vector3f(
+                p.directionVec.x.toFloat(),
+                if (onSlope) p.verticality.toFloat() else 0f,
+                p.directionVec.z.toFloat()
+            )
+                .mul(belt.directionAwareBeltMovementSpeed * 20)
+                .add(
+                    if (p.alongX) (sideOffset - transported.prevSideOffset) * 15 else 0f,
+                    0.0f,
+                    if (!p.alongX) (sideOffset - transported.prevSideOffset) * 15 else 0f
+                )
+        }
         for (i in 0..count) {
-            val itemMatrix = (baseMatrix.clone() as Matrix4f).apply {
-                rotate(rotYAngle)
-                applyItemLayering(this, i, blockItem, renderUpright, box, random)
-                scale(scaleValue, scaleValue, scaleValue)
-            }
+            instances.get(stack).apply {
+                if (flags has Flags.UPDATE_TRANSFORM) {
+                    val itemMatrix = (baseMatrix.clone() as Matrix4f).apply {
+                        rotate(rotYAngle)
+                        applyItemLayering(this, i, blockItem, renderUpright, box, random)
+                        scale(scaleValue, scaleValue, scaleValue)
+                    }
+                    this.setTransform(itemMatrix)
+                    this.anchorTime = renderTicks / 20f
+                    this.motion = motion
+                }
 
-            instances.get(itemStack).apply {
-                setTransform(itemMatrix)
-                if (packedLight != -1) light(packedLight)
-                setChanged()
+                if (flags has Flags.UPDATE_LIGHT) {
+                    this.light(packedLight)
+                }
+
+                this.setChanged()
             }
 
             advanceBaseMatrix(baseMatrix, blockItem, renderUpright)
         }
     }
 
-    private fun lerpIfMoving(pt: Float, prev: Float, current: Float): Float =
-        if (belt.speed == 0f) current else Mth.lerp(pt, prev, current)
-
-    private fun computeSlopeAngle(onSlope: Boolean, p: BeltParams): Float {
-        if (!onSlope) return 0f
-        val tiltForward = ((p.slope == BeltSlope.DOWNWARD) xor (p.beltFacing.axisDirection == Direction.AxisDirection.POSITIVE)) == (p.beltFacing.axis == Direction.Axis.Z)
-        return if (tiltForward) -45f else 45f
-    }
-
-    private fun computeLight(offset: Float, p: BeltParams): Int {
-        val shouldUpdate = dirty || relight || (
-                        (offset * p.directionVec.x * 10).toInt() +
-                        (offset * p.verticality    * 10).toInt() +
-                        (offset * p.directionVec.z * 10).toInt()
-                ) % 10 == 0
-
-        if (!shouldUpdate) return -1
-
-        val lightPos = visualPosition.offset(
-            (p.directionVec.x * offset).toInt(),
-            (p.verticality    * offset).toInt(),
-            (p.directionVec.z * offset).toInt()
-        )
-        return LightTexture.pack(
-            level.getBrightness(LightLayer.BLOCK, lightPos),
-            level.getBrightness(LightLayer.SKY, lightPos)
-        )
-    }
-
-    private fun placeShadow(ms: PoseStack, onSlope: Boolean) {
-        if (onSlope) return
+    private fun placeShadow(ms: PoseStack) {
         val matrix = ms.last().pose()
         val sx = matrix.m30()
         val sy = matrix.m31() - 0.12f
@@ -245,9 +263,22 @@ class BeltItemLayerVisual(
         }
     }
 
-    private fun orientUprightItem(ms: PoseStack, offset: Float, pt: Float) {
+    private fun lightPosFor(offset: Float, p: BeltParams) =
+        visualPosition.offset(
+            (p.directionVec.x * offset).toInt(),
+            (p.verticality * offset + 0.5f).toInt(),
+            (p.directionVec.z * offset).toInt()
+        )
+
+    private fun computeSlopeAngle(onSlope: Boolean, p: BeltParams): Float {
+        if (!onSlope) return 0f
+        val tiltForward = ((p.slope == BeltSlope.DOWNWARD) xor (p.beltFacing.axisDirection == Direction.AxisDirection.POSITIVE)) == (p.beltFacing.axis == Direction.Axis.Z)
+        return if (tiltForward) -45f else 45f
+    }
+
+    private fun orientUprightItem(ms: PoseStack, offset: Float) {
         mc.cameraEntity?.let { renderViewEntity ->
-            val positionVec = renderViewEntity.getPosition(pt)
+            val positionVec = renderViewEntity.position()
             val vectorForOffset = BeltHelper.getVectorForOffset(belt, offset)
             val diff = vectorForOffset.subtract(positionVec)
             val yRot = Mth.atan2(diff.x, diff.z).toFloat() + Math.PI.toFloat()
@@ -261,16 +292,9 @@ class BeltItemLayerVisual(
         blockItem: Boolean, renderUpright: Boolean, box: Boolean,
         random: RandomSource
     ) = m.run {
-        if (!blockItem && !renderUpright) {
-            translate(0f, -0.09375f, 0f)
-            rotate(rotX90)
-        }
-        if (blockItem && !box) {
-            translate(random.nextFloat() * 0.0625f * i, 0f, random.nextFloat() * 0.0625f * i)
-        }
-        if (box) {
-            translate(0f, 0.25f, 0f)
-        }
+        if (!blockItem && !renderUpright) { translate(0f, -0.09375f, 0f); rotate(rotX90) }
+        if (blockItem && !box) translate(random.nextFloat() * 0.0625f * i, 0f, random.nextFloat() * 0.0625f * i)
+        if (box) translate(0f, 0.25f, 0f)
     }
 
     private fun advanceBaseMatrix(base: Matrix4f, blockItem: Boolean, renderUpright: Boolean) {
@@ -291,49 +315,24 @@ class BeltItemLayerVisual(
 
     }
 
-    @JvmRecord
-    private data class BeltParams(
-        val beltFacing     : Direction,
-        val directionVec   : Vec3i,
-        val slope          : BeltSlope,
-        val slopeAlongX    : Boolean,
-        val alongX         : Boolean,
-        val verticality    : Int,
-        val beltStartOffset: Vec3,
-        val beltLength     : Int,
-    ) {
-        companion object {
-            fun from(belt: BeltBlockEntity): BeltParams {
-                val facing = belt.blockState.getValue(BeltBlock.HORIZONTAL_FACING)
-                val slope = belt.blockState.getValue(BeltBlock.SLOPE)
-                val verticality = when (slope) {
-                    BeltSlope.DOWNWARD -> -1
-                    BeltSlope.UPWARD -> 1
-                    else -> 0
-                }
-                return BeltParams(
-                    beltFacing             = facing,
-                    directionVec           = facing.normal,
-                    slope                  = slope,
-                    slopeAlongX            = facing.axis == Direction.Axis.X,
-                    alongX                 = facing.clockWise.axis == Direction.Axis.X,
-                    verticality            = verticality,
-                    beltStartOffset        = Vec3.atLowerCornerOf(facing.normal)
-                                                 .scale(-.5)
-                                                 .add(.5, 15 / 16.0, .5),
-                    beltLength             = belt.beltLength,
-                )
+    companion object {
+        private object Flags {
+            const val UPDATE_TRANSFORM = 1 shl 0
+            const val UPDATE_LIGHT = 1 shl 1
+            const val ITEM_STUCK = 1 shl 2
+
+            @Suppress("NOTHING_TO_INLINE")
+            inline infix fun Int.has(flag: Int): Boolean {
+                return (this and flag) == flag
             }
         }
-    }
 
-    companion object {
         private val UPRIGHT_CACHE = RendererReloadCache(BeltHelper::isItemUpright)
-        private val RANDOM: ThreadLocal<RandomSource> =
-            ThreadLocal.withInitial(RandomSource::createNewThreadLocalInstance)
+        private val RANDOM: ThreadLocal<RandomSource> = ThreadLocal.withInitial(RandomSource::createNewThreadLocalInstance)
         private val rotX90 = Axis.XP.rotationDegrees(90f)
         private val rotY10 = Axis.YP.rotationDegrees(10f)
         private val mc by lazy { Minecraft.getInstance() }
         private const val SLOPE_OFFSET = 1f / 8f
     }
 }
+

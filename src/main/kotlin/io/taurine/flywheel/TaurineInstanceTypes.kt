@@ -1,39 +1,40 @@
 package io.taurine.flywheel
 
-import com.simibubi.create.Create
 import dev.engine_room.flywheel.api.layout.FloatRepr
 import dev.engine_room.flywheel.api.layout.IntegerRepr
 import dev.engine_room.flywheel.api.layout.LayoutBuilder
 import dev.engine_room.flywheel.lib.instance.SimpleInstanceType
 import dev.engine_room.flywheel.lib.util.ExtraMemoryOps
+import dev.engine_room.flywheel.lib.util.ResourceUtil
 import io.taurine.Taurine
 import org.lwjgl.system.MemoryUtil
 
 object TaurineInstanceTypes {
-    val SCALING_FLUID: SimpleInstanceType<ScalingFluidInstance> = SimpleInstanceType.builder(::ScalingFluidInstance)
-		.cullShader(Create.asResource("instance/cull/fluid.glsl"))
-		.vertexShader(Taurine("instance/scaling_fluid.vert"))
-		.layout(
+    val CONSTANT_MOTION: SimpleInstanceType<ConstantMotionInstance> = SimpleInstanceType.builder(::ConstantMotionInstance)
+        .cullShader(Taurine("instance/cull/constant_motion.glsl"))
+        .vertexShader(Taurine("instance/constant_motion.vert"))
+        .layout(
             LayoutBuilder.create()
-			.matrix("pose", FloatRepr.FLOAT, 4)
-			.vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
-			.vector("light", IntegerRepr.SHORT, 2)
-			.scalar("vScale", FloatRepr.FLOAT)
-			.scalar("uScale", FloatRepr.FLOAT)
-            .scalar("v0", FloatRepr.FLOAT)
-			.scalar("u0", FloatRepr.FLOAT)
-			.build())
-		.writer { ptr, instance ->
-            ExtraMemoryOps.putMatrix4f(ptr, instance.pose)
-            MemoryUtil.memPutByte(ptr + 64, instance.red)
-            MemoryUtil.memPutByte(ptr + 65, instance.green)
-            MemoryUtil.memPutByte(ptr + 66, instance.blue)
-            MemoryUtil.memPutByte(ptr + 67, instance.alpha)
-            ExtraMemoryOps.put2x16(ptr + 68, instance.light)
-            MemoryUtil.memPutFloat(ptr + 72, instance.vScale)
-            MemoryUtil.memPutFloat(ptr + 76, instance.uScale)
-            MemoryUtil.memPutFloat(ptr + 80, instance.v0)
-            MemoryUtil.memPutFloat(ptr + 84, instance.u0)
+                .vector("color", FloatRepr.NORMALIZED_UNSIGNED_BYTE, 4)
+                .vector("overlay", IntegerRepr.SHORT, 2)
+                .vector("light", FloatRepr.UNSIGNED_SHORT, 2)
+                .matrix("pose", FloatRepr.FLOAT, 4)
+                .vector("motion", FloatRepr.FLOAT, 3)
+                .scalar("anchorTime", FloatRepr.FLOAT)
+                .build()
+        )
+        .writer { ptr, instance ->
+            MemoryUtil.memPutByte(ptr, instance.red)
+            MemoryUtil.memPutByte(ptr + 1, instance.green)
+            MemoryUtil.memPutByte(ptr + 2, instance.blue)
+            MemoryUtil.memPutByte(ptr + 3, instance.alpha)
+            ExtraMemoryOps.put2x16(ptr + 4, instance.overlay)
+            ExtraMemoryOps.put2x16(ptr + 8, instance.light)
+            ExtraMemoryOps.putMatrix4f(ptr + 12, instance.pose)
+            MemoryUtil.memPutFloat(ptr + 76, instance.mx)
+            MemoryUtil.memPutFloat(ptr + 80, instance.my)
+            MemoryUtil.memPutFloat(ptr + 84, instance.mz)
+            MemoryUtil.memPutFloat(ptr + 88, instance.anchorTime)
         }
         .build()
 }
