@@ -15,7 +15,6 @@ import io.taurine.mixin.create.accessor.LinkBehaviourAccessor;
 import net.createmod.catnip.data.Iterate;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemStack;
-import org.spongepowered.asm.mixin.Debug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

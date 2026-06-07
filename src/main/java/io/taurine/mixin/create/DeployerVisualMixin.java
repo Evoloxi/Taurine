@@ -8,21 +8,20 @@ import com.simibubi.create.content.kinetics.base.ShaftVisual;
 import com.simibubi.create.content.kinetics.deployer.DeployerBlockEntity;
 import com.simibubi.create.content.kinetics.deployer.DeployerVisual;
 import com.simibubi.create.foundation.render.AllInstanceTypes;
-import dev.engine_room.flywheel.api.model.IndexSequence;
-import dev.engine_room.flywheel.api.model.Mesh;
 import dev.engine_room.flywheel.api.model.Model;
-import dev.engine_room.flywheel.api.vertex.MutableVertexList;
 import dev.engine_room.flywheel.api.visual.TickableVisual;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.engine_room.flywheel.lib.instance.InstanceTypes;
 import dev.engine_room.flywheel.lib.instance.TransformedInstance;
-import dev.engine_room.flywheel.lib.model.SimpleModel;
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import dev.engine_room.flywheel.lib.util.RendererReloadCache;
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
 import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual;
 import dev.engine_room.vanillin.item.ItemModels;
 import io.taurine.ModelCache;
 import io.taurine.duck.DeployerDuck;
+import io.taurine.mesh.TransformedMesh;
+import io.taurine.mesh.TransformedModelKey;
 import io.taurine.mixin.create.accessor.DeployerBlockEntityAccessor;
 import net.createmod.catnip.math.AngleHelper;
 import net.minecraft.client.Minecraft;
@@ -37,16 +36,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
-import org.joml.Vector4fc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 import static com.simibubi.create.content.kinetics.base.DirectionalKineticBlock.FACING;
 
@@ -160,6 +155,11 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
     private final static Vector3f HALF_BLOCK = new Vector3f(0.5f, 0.5f, 0.5f);
 
     @Unique
+    private final static RendererReloadCache<TransformedModelKey, Model> TRANSFORMED_MODEL_CACHE = new RendererReloadCache<>(
+            key -> TransformedMesh.Companion.transformModel(key.model, key.offset, key.scale)
+    );
+
+    @Unique
     private void taurine$createRotatingInstance(ItemStack stack) {
         BakedModel baked = Minecraft.getInstance().getItemRenderer().getModel(stack, blockEntity.getLevel(), null, 0);
 
@@ -169,10 +169,12 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
 
         taurine$rotatingItemInstance = instancerProvider().instancer(
                 AllInstanceTypes.ROTATING,
-                taurine$offset(
-                        ItemModels.get(level, stack, ItemDisplayContext.GROUND),
-                        HALF_BLOCK,
-                        new Vector3f(scale, scale, scale)
+                TRANSFORMED_MODEL_CACHE.get(
+                        new TransformedModelKey(
+                                ItemModels.get(level, stack, ItemDisplayContext.GROUND),
+                                HALF_BLOCK,
+                                new Vector3f(scale, scale, scale)
+                        )
                 )
         ).createInstance();
 
@@ -189,61 +191,6 @@ public abstract class DeployerVisualMixin extends ShaftVisual<DeployerBlockEntit
                         level.getBrightness(LightLayer.SKY, pos)
                 ))
                 .setChanged();
-    }
-
-    @Unique
-    private Model taurine$offset(Model model, Vector3f offset, Vector3f scale) {
-        List<Model.ConfiguredMesh> meshes = model.meshes().stream().map(mesh ->
-                new Model.ConfiguredMesh(mesh.material(), new TransformedMesh(mesh.mesh(), offset, scale))
-        ).toList();
-        return new SimpleModel(meshes);
-    }
-
-    private static class TransformedMesh implements Mesh {
-        Mesh original;
-        Vector3f offset;
-        Vector3f scale;
-
-        private TransformedMesh(Mesh original, Vector3f offset, Vector3f scale) {
-            this.original = original;
-            this.offset = offset;
-            this.scale = scale;
-        }
-
-        @Override
-        public int vertexCount() {
-            return original.vertexCount();
-        }
-
-        @Override
-        public void write(MutableVertexList vertexList) {
-            original.write(vertexList);
-            for (int i = 0; i < vertexCount(); i++) {
-                vertexList.x(i, vertexList.x(i) * scale.x + offset.x);
-                vertexList.y(i, vertexList.y(i) * scale.y + offset.y);
-                vertexList.z(i, vertexList.z(i) * scale.z + offset.z);
-            }
-        }
-
-        @Override
-        public IndexSequence indexSequence() {
-            return original.indexSequence();
-        }
-
-        @Override
-        public int indexCount() {
-            return original.indexCount();
-        }
-
-        @Override
-        public Vector4fc boundingSphere() {
-            Vector4fc s = original.boundingSphere();
-            return new Vector4f(
-                    s.x() * scale.x + offset.x,
-                    s.y() * scale.y + offset.y,
-                    s.z() * scale.z + offset.z,
-                    s.w() * Math.max(scale.x, Math.max(scale.y, scale.z)));
-        }
     }
 
     @Unique
