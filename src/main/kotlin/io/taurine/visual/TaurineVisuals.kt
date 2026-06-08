@@ -1,18 +1,22 @@
 package io.taurine.visual
 
 import com.simibubi.create.AllBlockEntityTypes
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity
+import com.tterrag.registrate.util.entry.BlockEntityEntry
 import dev.engine_room.flywheel.api.visual.Visual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.api.visualization.VisualizerRegistry
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer
 import dev.engine_room.vanillin.VanillinXplat
 import dev.engine_room.vanillin.compose.ConfiguredElement
+import dev.engine_room.vanillin.compose.VisualizationPredicate
 import dev.engine_room.vanillin.config.BlockEntityVisualizerBuilder
 import dev.engine_room.vanillin.config.Configurator
 import dev.engine_room.vanillin.config.VisualConfigValue
-import io.taurine.mixin.vanillin.accesor.BlockEntityVisualizerBuilderAccessor
+import io.taurine.extension.inaccessible.type
 import io.taurine.visual.impl.BeltItemLayerVisual
+import io.taurine.visual.impl.DepotVisual
+import io.taurine.visual.impl.FilterVisual
+import io.taurine.visual.impl.LinkVisual
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 
@@ -27,16 +31,57 @@ object TaurineVisuals {
     // Experimental visuals are enabled by default in dev.
     val EXPERIMENTAL: Boolean = VanillinXplat.INSTANCE.isDevelopmentEnvironment
 
-
     init {
-        builder<BeltBlockEntity>(AllBlockEntityTypes.BELT.get())
+        builder(AllBlockEntityTypes.BELT)
             .add(::BeltItemLayerVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.SAW)
+            .add(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.FUNNEL)
+            .add(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.DEPLOYER)
+            .add(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.DEPOT)
+            .factory(::DepotVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.DEPOT)
+            .factory(::DepotVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.BASIN)
+            .factory(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.CREATIVE_CRATE)
+            .factory(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.SMART_CHUTE)
+            .factory(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.SMART_FLUID_PIPE)
+            .factory(::FilterVisual)
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.REDSTONE_LINK)
+            .factory(::LinkVisual)
             .apply(STABLE)
 
         CONFIGURATOR.blockEntities.forEach { [_, entity] -> entity.set(VisualConfigValue.FORCE_ENABLE, null) } //TODO
     }
 
-    fun <T : BlockEntity> BlockEntityVisualizerBuilder<T>.add(visualFactory: SimpleBlockEntityVisualizer.Factory<T>): BlockEntityVisualizerBuilder<T> {
+    private fun <T : BlockEntity> BlockEntityVisualizerBuilder<T>.add(visualFactory: SimpleBlockEntityVisualizer.Factory<T>): BlockEntityVisualizerBuilder<T> {
+        val original = VisualizerRegistry.getVisualizer(this.type)
+
         return this.factory { ctx, blockEntity, partialTick ->
             val elements: Array<ConfiguredElement<in T>> = [
                 object : ConfiguredElement<T> {
@@ -59,20 +104,18 @@ object TaurineVisuals {
                         entity: T,
                         partialTick: Float
                     ): Visual? {
-                        val type = (this@add as BlockEntityVisualizerBuilderAccessor<T>).`accessor$type`()
-                        val previous = VisualizerRegistry.getVisualizer(type)
-                        return previous?.createVisual(ctx, entity, partialTick)
+                        return original?.createVisual(ctx, entity, partialTick)
                     }
 
                     override fun shouldVisualize(
                         ctx: VisualizationContext,
                         entity: T
                     ): Boolean {
-                        return true //TODO
+                        return original != null // TODO
                     }
                 }
             ]
-            val controller = ComposableBlockEntityVisual.Controller(elements) { _, _ -> true }
+            val controller = ComposableBlockEntityVisual.Controller(elements, VisualizationPredicate.alwaysTrue())
             ComposableBlockEntityVisual(ctx, blockEntity, partialTick, controller)
         }
     }
@@ -81,6 +124,9 @@ object TaurineVisuals {
         return BlockEntityVisualizerBuilder(CONFIGURATOR, type)
     }
 
-    fun init() {
+    fun <T : BlockEntity> builder(type: BlockEntityEntry<T>): BlockEntityVisualizerBuilder<T> {
+        return builder(type.get())
     }
+
+    fun init() {}
 }

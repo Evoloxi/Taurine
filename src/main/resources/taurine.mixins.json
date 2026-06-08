@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "plugin": "io.taurine.TaurineMixinPlugin",
   "client": [
-    "create.AllBlockEntityTypesMixin",
     "create.BasinBlockEntityMixin",
     "create.BeltRendererMixin",
     "create.DepotBehaviourMixin",
@@ -17,11 +16,9 @@
     "create.accessor.FilteringBehaviourAccessor",
     "create.accessor.FluidTankBlockEntityAccessor",
     "create.accessor.LinkBehaviourAccessor",
-    "create.filter_visual.DeployerVisualMixin",
     "create.filter_visual.FilteringBehaviourMixin",
     "create.filter_visual.FilteringRendererMixin",
     "create.filter_visual.LinkBehaviourMixin",
-    "create.filter_visual.SawVisualMixin",
     "flywheel.accessor.AbstractVisualAccessor",
     "gnkinetics.ChainableCogwheelRendererMixin",
     "gnkinetics.GearsBETypesMixin",
@@ -39,12 +36,10 @@
     "minVersion": "0.5.0"
   },
   "mixins": [
-    "create.BeltVisualMixin",
     "create.DeployerBlockEntityMixin",
     "create.DeployerRendererMixin",
     "create.DeployerVisualMixin",
     "create.accessor.DeployerBlockEntityAccessor",
-    "create.filter_visual.FunnelVisualMixin",
     "create.filter_visual.LinkRendererMixin",
     "vanillin.accesor.BlockEntityVisualizerBuilderAccessor"
   ]

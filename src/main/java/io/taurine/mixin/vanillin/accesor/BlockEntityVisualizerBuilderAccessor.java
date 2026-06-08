@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(BlockEntityVisualizerBuilder.class)
 public interface BlockEntityVisualizerBuilderAccessor<T extends BlockEntity> {
     @Accessor("type")
-    BlockEntityType<T> accessor$type();
+    BlockEntityType<T> getType();
 }
