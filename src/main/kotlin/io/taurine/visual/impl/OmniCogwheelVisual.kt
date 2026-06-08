@@ -1,4 +1,4 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockEntity
 import com.simibubi.create.content.kinetics.simpleRelays.ICogWheel

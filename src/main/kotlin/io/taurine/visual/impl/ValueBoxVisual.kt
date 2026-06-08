@@ -1,7 +1,8 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.content.kinetics.simpleRelays.AbstractSimpleShaftBlock
+import io.taurine.visual.ItemRendering
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.tags.BlockTags

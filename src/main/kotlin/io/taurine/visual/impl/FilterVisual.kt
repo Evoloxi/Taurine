@@ -1,4 +1,4 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.AllBlocks
@@ -11,6 +11,7 @@ import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
 import io.taurine.ModelCache.canBeInstanced
 import io.taurine.extension.translate
+import io.taurine.visual.dispatcherDelegate
 import net.createmod.catnip.data.Iterate
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.item.ItemDisplayContext

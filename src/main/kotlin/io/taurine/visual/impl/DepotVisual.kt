@@ -1,4 +1,4 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
@@ -17,6 +17,8 @@ import io.taurine.extension.inaccessible.depotBehaviour
 import io.taurine.extension.inaccessible.heldItem
 import io.taurine.extension.inaccessible.incoming
 import io.taurine.extension.inaccessible.processingOutputBuffer
+import io.taurine.visual.ItemRendering
+import io.taurine.visual.dispatcherDelegate
 import net.createmod.catnip.math.VecHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LightTexture

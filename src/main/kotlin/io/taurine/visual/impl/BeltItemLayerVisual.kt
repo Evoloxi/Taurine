@@ -1,4 +1,4 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
@@ -22,7 +22,8 @@ import io.taurine.flywheel.PreservingInstanceRecycler
 import io.taurine.flywheel.SmartPreservingRecycler
 import io.taurine.flywheel.TaurineInstanceTypes
 import io.taurine.mesh.ShadowMesh.SHADOW_MODEL
-import io.taurine.visual.BeltItemLayerVisual.Companion.Flags.has
+import io.taurine.visual.impl.BeltItemLayerVisual.Companion.Flags.has
+import io.taurine.visual.BeltParams
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.minecraft.client.Minecraft
@@ -34,6 +35,7 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.LightLayer
+import net.minecraft.world.level.block.entity.BlockEntity
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.util.function.Consumer
@@ -50,6 +52,10 @@ class BeltItemLayerVisual(
         val lightBlock: BlockPos,
         val packedLight: Int,
     )
+
+    init {
+        println("INITQQQ")
+    }
 
     private val knownState = Reference2ObjectOpenHashMap<TransportedItemStack, ItemState>(8)
 

@@ -1,43 +1,4 @@
-package io.taurine.visual
-
-import com.mojang.blaze3d.vertex.PoseStack
-import com.simibubi.create.content.fluids.FluidMesh
-import com.simibubi.create.content.processing.basin.BasinBlock
-import com.simibubi.create.content.processing.basin.BasinBlockEntity
-import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour
-import dev.engine_room.flywheel.api.instance.Instance
-import dev.engine_room.flywheel.api.visual.DynamicVisual
-import dev.engine_room.flywheel.api.visualization.VisualizationContext
-import dev.engine_room.flywheel.lib.transform.TransformStack
-import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import io.taurine.flywheel.SmartPreservingRecycler
-import io.taurine.extension.inaccessible.ingredientRotation
-import io.taurine.extension.inaccessible.itemCapability
-import io.taurine.extension.inaccessible.visualizedOutputItems
-import io.taurine.extension.pixel
-import io.taurine.extension.translate
-import io.taurine.flywheel.ScalingFluidInstance
-import io.taurine.flywheel.TaurineInstanceTypes
-import net.createmod.catnip.animation.AnimationTickHolder
-import net.createmod.catnip.math.AngleHelper
-import net.createmod.catnip.math.VecHelper
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.LightTexture
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
-import net.minecraft.util.Mth
-import net.minecraft.util.RandomSource
-import net.minecraft.world.inventory.InventoryMenu
-import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.level.LightLayer
-import net.minecraft.world.phys.Vec3
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
-import net.neoforged.neoforge.items.IItemHandlerModifiable
-import net.neoforged.neoforge.items.ItemStackHandler
-import java.util.function.Consumer
-import kotlin.math.max
+package io.taurine.visual.impl
 
 /*
 class BasinVisual(

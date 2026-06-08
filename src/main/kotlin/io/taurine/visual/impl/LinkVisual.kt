@@ -1,4 +1,4 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.mojang.blaze3d.vertex.PoseStack
 import com.simibubi.create.content.redstone.link.LinkBehaviour
@@ -12,6 +12,7 @@ import io.taurine.extension.inaccessible.frequencyFirst
 import io.taurine.extension.inaccessible.frequencyLast
 import io.taurine.extension.inaccessible.secondSlot
 import io.taurine.extension.translate
+import io.taurine.visual.dispatcherDelegate
 import net.createmod.catnip.data.Iterate
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.world.item.ItemDisplayContext

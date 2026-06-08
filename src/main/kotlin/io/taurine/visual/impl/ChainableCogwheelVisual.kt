@@ -1,41 +1,34 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
 import com.simibubi.create.AllPartialModels
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer
 import com.simibubi.create.content.kinetics.base.RotatingInstance
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual
-import com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockEntity
 import com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockEntityRenderer
 import com.simibubi.create.foundation.render.AllInstanceTypes
 import dev.engine_room.flywheel.api.instance.Instance
-import dev.engine_room.flywheel.api.model.Model
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.model.Models
+import dev.lopyluna.gnkinetics.content.blocks.kinetics.chainned_cog.ChainableCogwheelBE
+import dev.lopyluna.gnkinetics.register.client.GearsPartialModels
 import java.util.function.Consumer
 
-open class CogwheelWithShaftVisual(
-    context: VisualizationContext,
-    blockEntity: BracketedKineticBlockEntity,
-    partialTick: Float, model: Model
-) :
-    SingleAxisRotatingVisual<BracketedKineticBlockEntity>(
-        context,
-        blockEntity,
-        partialTick,
-        model
-    ) {
+class ChainableCogwheelVisual(
+    context: VisualizationContext, blockEntity: ChainableCogwheelBE, partialTick: Float
+) : SingleAxisRotatingVisual<ChainableCogwheelBE>(
+    context, blockEntity, partialTick, Models.partial(GearsPartialModels.CHAINABLE_COGWHEEL)
+) {
 
-    protected val additionalShaft: RotatingInstance
+    val shaft: RotatingInstance
 
     init {
         val axis = KineticBlockEntityRenderer.getRotationAxisOf(blockEntity)
 
-        additionalShaft =
-            instancerProvider().instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
-                .createInstance()
+        shaft = instancerProvider()
+            .instancer(AllInstanceTypes.ROTATING, Models.partial(AllPartialModels.COGWHEEL_SHAFT))
+            .createInstance()
 
-
-        additionalShaft.rotateToFace(axis)
+        shaft.rotateToFace(axis)
             .setup(blockEntity)
             .setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(axis, pos))
             .setPosition(visualPosition)
@@ -44,34 +37,23 @@ open class CogwheelWithShaftVisual(
 
     override fun update(pt: Float) {
         super.update(pt)
-        additionalShaft.setup(blockEntity)
+        shaft.setup(blockEntity)
             .setRotationOffset(BracketedKineticBlockEntityRenderer.getShaftAngleOffset(rotationAxis(), pos))
             .setChanged()
     }
 
     override fun updateLight(partialTick: Float) {
         super.updateLight(partialTick)
-        relight(additionalShaft)
+        relight(shaft)
     }
 
     override fun _delete() {
         super._delete()
-        additionalShaft.delete()
+        shaft.delete()
     }
 
     override fun collectCrumblingInstances(consumer: Consumer<Instance?>) {
         super.collectCrumblingInstances(consumer)
-        consumer.accept(additionalShaft)
+        consumer.accept(shaft)
     }
-
-    open class Large(
-        context: VisualizationContext,
-        blockEntity: BracketedKineticBlockEntity,
-        partialTick: Float, model: Model
-    ) : CogwheelWithShaftVisual(
-            context,
-            blockEntity,
-            partialTick,
-            model
-        )
 }

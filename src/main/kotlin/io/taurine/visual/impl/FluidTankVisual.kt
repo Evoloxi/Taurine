@@ -1,36 +1,17 @@
-package io.taurine.visual
+package io.taurine.visual.impl
 
-import com.mojang.blaze3d.vertex.PoseStack
-import com.simibubi.create.content.fluids.FluidMesh
-import com.simibubi.create.content.fluids.tank.FluidTankBlockEntity
-import dev.engine_room.flywheel.api.instance.Instance
 import dev.engine_room.flywheel.api.material.CardinalLightingMode
 import dev.engine_room.flywheel.api.material.Transparency
 import dev.engine_room.flywheel.api.model.Model
 import dev.engine_room.flywheel.api.vertex.MutableVertexList
-import dev.engine_room.flywheel.api.visual.DynamicVisual
-import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.lib.material.SimpleMaterial
 import dev.engine_room.flywheel.lib.model.QuadMesh
 import dev.engine_room.flywheel.lib.model.SingleMeshModel
-import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
-import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
-import io.taurine.extension.inaccessible.window
-import io.taurine.extension.translate
-import io.taurine.flywheel.ScalingFluidInstance
-import io.taurine.flywheel.SmartPreservingRecycler
-import io.taurine.flywheel.TaurineInstanceTypes
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.core.Direction
 import net.minecraft.util.Mth
-import net.minecraft.world.inventory.InventoryMenu
-import net.minecraft.world.level.LightLayer
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions
 import org.joml.Vector4f
 import org.joml.Vector4fc
-import java.util.function.Consumer
 
 @JvmRecord
 data class FaceData(
