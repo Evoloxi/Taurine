@@ -6,7 +6,7 @@ import com.simibubi.create.content.kinetics.deployer.DeployerVisual;
 import dev.engine_room.flywheel.api.visual.TickableVisual;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.engine_room.flywheel.lib.visual.AbstractVisual;
-import io.taurine.visual.FilterVisual;
+import io.taurine.visual.impl.FilterVisual;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

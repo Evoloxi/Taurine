@@ -5,7 +5,7 @@ import com.simibubi.create.content.logistics.funnel.FunnelVisual;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
 import dev.engine_room.flywheel.api.visual.Visual;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
-import io.taurine.visual.FilterVisual;
+import io.taurine.visual.impl.FilterVisual;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

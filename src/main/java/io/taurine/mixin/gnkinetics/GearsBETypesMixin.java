@@ -1,17 +1,14 @@
 package io.taurine.mixin.gnkinetics;
 
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
-import com.simibubi.create.AllBlockEntityTypes;
-import com.simibubi.create.content.kinetics.belt.BeltBlockEntity;
 import com.simibubi.create.content.kinetics.simpleRelays.BracketedKineticBlockEntity;
 import com.simibubi.create.foundation.data.CreateBlockEntityBuilder;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import dev.lopyluna.gnkinetics.content.blocks.kinetics.chainned_cog.ChainableCogwheelBE;
 import dev.lopyluna.gnkinetics.register.GearsBETypes;
-import io.taurine.visual.ChainableCogwheelVisual;
-import io.taurine.visual.OmniCogwheelVisual;
+import io.taurine.visual.impl.ChainableCogwheelVisual;
+import io.taurine.visual.impl.OmniCogwheelVisual;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;

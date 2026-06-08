@@ -8,7 +8,6 @@
     "create.AllBlockEntityTypesMixin",
     "create.BasinBlockEntityMixin",
     "create.BeltRendererMixin",
-    "create.BeltSlicerMixin",
     "create.DepotBehaviourMixin",
     "create.DepotRendererMixin",
     "create.FluidTankRendererMixin",
@@ -46,6 +45,7 @@
     "create.DeployerVisualMixin",
     "create.accessor.DeployerBlockEntityAccessor",
     "create.filter_visual.FunnelVisualMixin",
-    "create.filter_visual.LinkRendererMixin"
+    "create.filter_visual.LinkRendererMixin",
+    "vanillin.accesor.BlockEntityVisualizerBuilderAccessor"
   ]
 }

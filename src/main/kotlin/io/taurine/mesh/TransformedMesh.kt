@@ -18,11 +18,11 @@ class TransformedMesh(
 ) : Mesh {
 
     companion object {
-        private val ZERO = Vector3f()
+        private val IDENTITY = Vector3f(1f)
 
         @JvmOverloads
         @JvmStatic
-        fun transformModel(model: Model, offset: Vector3f, scale: Vector3f = ZERO): SimpleModel {
+        fun transformModel(model: Model, offset: Vector3f, scale: Vector3f = IDENTITY): SimpleModel {
             return SimpleModel(model.meshes().map {
                 ConfiguredMesh(
                     it.material(),
