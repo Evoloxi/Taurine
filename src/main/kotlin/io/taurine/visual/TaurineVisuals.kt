@@ -32,54 +32,52 @@ object TaurineVisuals {
     val EXPERIMENTAL: Boolean = VanillinXplat.INSTANCE.isDevelopmentEnvironment
 
     init {
-        builder(AllBlockEntityTypes.BELT)
-            .add(::BeltItemLayerVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.SAW)
-            .add(::FilterVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.FUNNEL)
-            .add(::FilterVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.DEPLOYER)
-            .add(::FilterVisual)
+        builder(AllBlockEntityTypes.DEPOT)
+            .factory(::DepotVisual)
+            .neverSkipVanillaRender()
             .apply(STABLE)
 
         builder(AllBlockEntityTypes.DEPOT)
             .factory(::DepotVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.DEPOT)
-            .factory(::DepotVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.BASIN)
-            .factory(::FilterVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.CREATIVE_CRATE)
-            .factory(::FilterVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.SMART_CHUTE)
-            .factory(::FilterVisual)
-            .apply(STABLE)
-
-        builder(AllBlockEntityTypes.SMART_FLUID_PIPE)
-            .factory(::FilterVisual)
+            .neverSkipVanillaRender()
             .apply(STABLE)
 
         builder(AllBlockEntityTypes.REDSTONE_LINK)
             .factory(::LinkVisual)
+            .neverSkipVanillaRender()
+            .apply(STABLE)
+
+        for (entry in [
+            AllBlockEntityTypes.BASIN,
+            AllBlockEntityTypes.CREATIVE_CRATE,
+            AllBlockEntityTypes.SMART_CHUTE,
+            AllBlockEntityTypes.SMART_FLUID_PIPE
+        ]) builder(entry)
+            .factory(::FilterVisual)
+            .neverSkipVanillaRender()
+            .apply(STABLE)
+
+        /**
+         *  These already have a visual associated, so we wrap it in a ComposableBlockEntityVisual together with our new one
+         *  */
+        for (entry in [
+            AllBlockEntityTypes.SAW,
+            AllBlockEntityTypes.FUNNEL,
+            AllBlockEntityTypes.DEPLOYER
+        ]) builder(entry)
+            .bundle(::FilterVisual)
+            .neverSkipVanillaRender()
+            .apply(STABLE)
+
+        builder(AllBlockEntityTypes.BELT)
+            .bundle(::BeltItemLayerVisual)
+            .neverSkipVanillaRender()
             .apply(STABLE)
 
         CONFIGURATOR.blockEntities.forEach { [_, entity] -> entity.set(VisualConfigValue.FORCE_ENABLE, null) } //TODO
     }
 
-    private fun <T : BlockEntity> BlockEntityVisualizerBuilder<T>.add(visualFactory: SimpleBlockEntityVisualizer.Factory<T>): BlockEntityVisualizerBuilder<T> {
+    private fun <T : BlockEntity> BlockEntityVisualizerBuilder<T>.bundle(visualFactory: SimpleBlockEntityVisualizer.Factory<T>): BlockEntityVisualizerBuilder<T> { // TODO: extend BlockEntityVisualizerBuilder myself
         val original = VisualizerRegistry.getVisualizer(this.type)
 
         return this.factory { ctx, blockEntity, partialTick ->
