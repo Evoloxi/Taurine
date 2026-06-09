@@ -39,8 +39,11 @@
     "create.DeployerBlockEntityMixin",
     "create.DeployerRendererMixin",
     "create.DeployerVisualMixin",
+    "create.accessor.BeltInventoryAccessor",
     "create.accessor.DeployerBlockEntityAccessor",
     "create.filter_visual.LinkRendererMixin",
+    "flywheel.FloatReprMixin",
+    "flywheel.InstanceAssemblerComponentMixin",
     "vanillin.accesor.BlockEntityVisualizerBuilderAccessor"
   ]
 }
