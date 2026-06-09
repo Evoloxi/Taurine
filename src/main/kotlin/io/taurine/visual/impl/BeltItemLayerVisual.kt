@@ -8,12 +8,14 @@ import com.simibubi.create.content.kinetics.belt.BeltSlope
 import com.simibubi.create.content.kinetics.belt.transport.TransportedItemStack
 import com.simibubi.create.content.logistics.box.PackageItem
 import dev.engine_room.flywheel.api.instance.Instance
+import dev.engine_room.flywheel.api.visual.DynamicVisual
 import dev.engine_room.flywheel.api.visual.TickableVisual
 import dev.engine_room.flywheel.api.visualization.VisualizationContext
 import dev.engine_room.flywheel.backend.mixin.LevelRendererAccessor
 import dev.engine_room.flywheel.lib.instance.InstanceTypes
 import dev.engine_room.flywheel.lib.util.RendererReloadCache
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual
+import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual
 import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual
 import dev.engine_room.vanillin.item.ItemModels
 import io.taurine.ModelCache.canBeInstanced
@@ -39,10 +41,11 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import java.util.function.Consumer
 import kotlin.math.abs
+import kotlin.math.sign
 
 class BeltItemLayerVisual(
     ctx: VisualizationContext, val belt: BeltBlockEntity, partialTick: Float
-) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick), SimpleTickableVisual {
+) : AbstractBlockEntityVisual<BeltBlockEntity>(ctx, belt, partialTick), SimpleTickableVisual, SimpleDynamicVisual {
 
     private data class ItemState(
         val stuck: Boolean,
@@ -50,11 +53,8 @@ class BeltItemLayerVisual(
         val stackCount: Int,
         val lightBlock: BlockPos,
         val packedLight: Int,
+        val beltMovementSpeed: Float,
     )
-
-    init {
-        println("INITQQQ")
-    }
 
     private val knownState = Reference2ObjectOpenHashMap<TransportedItemStack, ItemState>(8)
 
@@ -79,10 +79,6 @@ class BeltItemLayerVisual(
     init { update(partialTick) }
 
     override fun update(pt: Float) {
-        needsFullRebuild = true
-    }
-
-    override fun tick(context: TickableVisual.Context) {
         if (!belt.isController) return
         val inv = belt.inventory ?: return
 
@@ -95,7 +91,6 @@ class BeltItemLayerVisual(
         }
 
         instances.resetCount()
-        shadows.resetCount()
 
         for (transported in inv.transportedItems) {
             if (!transported.stack.canBeInstanced) continue
@@ -107,20 +102,22 @@ class BeltItemLayerVisual(
             )
 
             val prev = knownState[transported]
+            val distToExit = abs( (beltParams.beltLength - 0.5f) - transported.beltPosition)
+            val distToEntry = abs(transported.beltPosition - 0.5f)
             val nearSlopeBoundary = beltParams.slope != BeltSlope.HORIZONTAL && run {
                 val tickDelta = abs(belt.speed) / 24f
-                val distToEntry = abs(transported.beltPosition - 0.5f)
-                val distToExit = abs(transported.beltPosition - (beltParams.beltLength - 0.5f))
                 minOf(distToEntry, distToExit) < tickDelta * 2
             }
             val stuck = (belt.speed != 0f && (transported.prevBeltPosition - transported.beltPosition) == 0f)
 
-            val motionChanged = prev == null ||
-                    (stuck != prev.stuck) ||
-                    ((transported.prevSideOffset - transported.sideOffset) * belt.speed > EPSILON) ||
-                    transported.angle != prev.angle ||
-                    transported.stack.count != prev.stackCount ||
-                    nearSlopeBoundary
+            val motionChanged =
+                prev == null ||
+                        (belt.beltMovementSpeed != prev.beltMovementSpeed) ||
+                        (stuck != prev.stuck) ||
+                        transported.angle != prev.angle ||
+                        transported.stack.count != prev.stackCount ||
+                        nearSlopeBoundary || distToEntry < 1.5f * belt.beltMovementSpeed || distToExit < 1.5f * belt.beltMovementSpeed ||
+                        abs(transported.prevBeltPosition - transported.insertedAt * belt.directionAwareBeltMovementSpeed.sign) < 2
 
             val lightChanged = prev == null || lightPos != prev.lightBlock
 
@@ -130,9 +127,9 @@ class BeltItemLayerVisual(
 
             if (needsWrite || (needsRelight || lightChanged)) {
                 var flags = 0
-                if (needsWrite)                   flags = flags or Flags.UPDATE_TRANSFORM
+                if (needsWrite) flags = flags or Flags.UPDATE_TRANSFORM
                 if (lightChanged || needsRelight) flags = flags or Flags.UPDATE_LIGHT
-                if (stuck)                        flags = flags or Flags.ITEM_STUCK
+                if (stuck) flags = flags or Flags.ITEM_STUCK
 
                 writeInstances(transported, beltParams, ticks, packedLight, flags)
                 knownState[transported] = ItemState(
@@ -141,19 +138,22 @@ class BeltItemLayerVisual(
                     stackCount = transported.stack.count,
                     lightBlock = lightPos,
                     packedLight = packedLight,
+                    beltMovementSpeed = belt.beltMovementSpeed
                 )
             } else {
                 instances.preserve(transported.stack, count + 1)
-                shadows.preserve(1)
             }
         }
 
         instances.discardExtra()
-        shadows.discardExtra()
 
         needsFullRebuild = false
         needsRelight = false
         belt.networkDirty = false
+    }
+
+    override fun tick(ctx: TickableVisual.Context) {
+        update(0f)
     }
 
     private fun writeInstances(
@@ -166,7 +166,7 @@ class BeltItemLayerVisual(
         val stack = transported.stack
         val random = RANDOM.get().also { it.setSeed(transported.angle.toLong()) }
 
-        val offset = transported.beltPosition
+        val offset = transported.prevBeltPosition // using the previous position prevents visual overshoot and snapping
         val sideOffset = transported.sideOffset
 
         val verticalMovement = if (offset < 0.5f) 0f
@@ -190,7 +190,8 @@ class BeltItemLayerVisual(
         val ms = PoseStack()
         ms.setIdentity()
 
-        val adjustedSideOffset = if (p.alongX) +sideOffset else -sideOffset
+        val prevSideOffset = transported.prevSideOffset
+        val adjustedSideOffset = if (p.alongX) +prevSideOffset else -prevSideOffset
         ms.translate(
             itemPos.x + if (p.alongX) adjustedSideOffset else 0f,
             itemPos.y,
@@ -209,7 +210,7 @@ class BeltItemLayerVisual(
         }
         if (onSlope) ms.translate(0f, SLOPE_OFFSET, 0f)
 
-        if (!onSlope) placeShadow(ms)
+        //if (!onSlope) placeShadow(ms)
 
         if (renderUpright) orientUprightItem(ms, offset)
 
@@ -219,16 +220,22 @@ class BeltItemLayerVisual(
         val motion = if (flags has Flags.ITEM_STUCK) {
             Vector3f()
         } else {
+            val dPos = transported.beltPosition - transported.prevBeltPosition
+            val dSide = transported.sideOffset - transported.prevSideOffset
+
+            val forwardVel = dPos * 20f
+            val sideVel = dSide * 20f
+
             Vector3f(
                 p.directionVec.x.toFloat(),
                 if (onSlope) p.verticality.toFloat() else 0f,
                 p.directionVec.z.toFloat()
             )
-                .mul(belt.directionAwareBeltMovementSpeed * 20)
+                .mul(forwardVel)
                 .add(
-                    if (p.alongX) (sideOffset - transported.prevSideOffset) * 15 else 0f,
+                    if (p.alongX) sideVel else 0f,
                     0.0f,
-                    if (!p.alongX) (sideOffset - transported.prevSideOffset) * 15 else 0f
+                    if (!p.alongX) sideVel else 0f
                 )
         }
         for (i in 0..count) {
@@ -255,18 +262,45 @@ class BeltItemLayerVisual(
         }
     }
 
-    private fun placeShadow(ms: PoseStack) {
-        val matrix = ms.last().pose()
-        val sx = matrix.m30()
-        val sy = matrix.m31() - 0.12f
-        val sz = matrix.m32()
+    private fun placeShadow(sx: Float, sy: Float, sz: Float) {
         shadows.get().apply {
-            x = sx - 0.2f; y = sy; z = sz - 0.2f
+            x = sx - 0.2f; y = sy - 0.12f; z = sz - 0.2f
             entityX = sx; entityZ = sz
             radius  = 0.2f; alpha = 0.5f
             sizeX   = 0.4f; sizeZ = 0.4f
             setChanged()
         }
+    }
+
+    override fun beginFrame(ctx: DynamicVisual.Context) {
+        if (!belt.isController || belt.speed == 0f) return
+        shadows.resetCount()
+        if (mc.cameraEntity!!.distanceToSqr(pos.bottomCenter) >= 64) return
+
+        val p = BeltParams.from(belt)
+        for (transported in belt.inventory.transportedItems) {
+            val offset = Mth.lerp(ctx.partialTick(),transported.prevBeltPosition, transported.beltPosition)
+            val sideOffset = Mth.lerp(ctx.partialTick(),transported.prevSideOffset, transported.sideOffset)
+
+            val offsetVec = Vector3f(p.directionVec.x.toFloat(), 0f, p.directionVec.z.toFloat())
+                .mul(offset)
+
+            val itemPos = p.beltStartOffset.add(
+                (visualPosition.x + offsetVec.x).toDouble(),
+                (visualPosition.y + offsetVec.y).toDouble(),
+                (visualPosition.z + offsetVec.z).toDouble()
+            )
+
+            val adjustedSideOffset = if (p.alongX) +sideOffset else -sideOffset
+
+            placeShadow(
+                (itemPos.x + if (p.alongX) adjustedSideOffset else 0f).toFloat(),
+                itemPos.y.toFloat(),
+                (itemPos.z + if (!p.alongX) adjustedSideOffset else 0f).toFloat()
+            )
+        }
+
+        shadows.discardExtra()
     }
 
     private fun lightPosFor(offset: Float, p: BeltParams) =
