@@ -167,7 +167,6 @@ class BeltItemLayerVisual(
         val random = RANDOM.get().also { it.setSeed(transported.angle.toLong()) }
 
         val offset = transported.prevBeltPosition // using the previous position prevents visual overshoot and snapping
-        val sideOffset = transported.sideOffset
 
         val verticalMovement = if (offset < 0.5f) 0f
         else p.verticality * (Mth.clamp(offset, 0.5f, p.beltLength - 0.5f) - 0.5f)

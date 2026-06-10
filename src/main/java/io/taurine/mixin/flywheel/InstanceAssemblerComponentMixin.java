@@ -26,7 +26,7 @@ public abstract class InstanceAssemblerComponentMixin {
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void inject(CallbackInfo ci) {
-        FLOAT_UNPACKING_FUNCS.put(TaurineFloatRepr.HALF, e -> e.callFunction("unpackHalf2x16").swizzle("x"));
+        FLOAT_UNPACKING_FUNCS.put(TaurineFloatRepr.HALF, e -> e.callFunction("unpackHalf2x16"));
     }
 
     @WrapOperation(
@@ -48,7 +48,7 @@ public abstract class InstanceAssemblerComponentMixin {
             return original.call(instance, outType, size, byteOffset, byteSize, unpackingFunc);
         }
 
-        return TaurineFloatRepr.unpackHalf2x16(instance, outType, size, byteOffset);
+        return TaurineFloatRepr.unpackHalf2x16(instance, outType, size, byteOffset, unpackingFunc::apply);
     }
 }
 

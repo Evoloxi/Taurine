@@ -11,7 +11,7 @@ object TaurineFloatRepr {
     @JvmField
     val HALF = FloatRepr.valueOf("HALF")
 
-    val SUPPORTS_F16: Boolean = GlCompat.MAX_GLSL_VERSION >= GlslVersion.V420 || GlCompat.CAPABILITIES.GL_ARB_shading_language_packing
+    private val SUPPORTS_F16: Boolean = GlCompat.MAX_GLSL_VERSION >= GlslVersion.V420 || GlCompat.CAPABILITIES.GL_ARB_shading_language_packing
 
     @JvmStatic
     fun unpackHalf2x16(
@@ -19,6 +19,7 @@ object TaurineFloatRepr {
         outType: String,
         size: Int,
         byteOffset: Int,
+        unpackingFunc: (GlslExpr) -> GlslExpr,
     ): GlslExpr {
         check(SUPPORTS_F16) { "unpackHalf2x16 not supported" }
 
@@ -28,7 +29,7 @@ object TaurineFloatRepr {
         var i = 0
         while (i < size) {
             val wordOffset = (shortOffset + i) / 2
-            val vec2 = GlslExpr.call("unpackHalf2x16", instance.access(wordOffset))
+            val vec2 = unpackingFunc(instance.access(wordOffset))
             if (i + 1 < size && (shortOffset + i) % 2 == 0) {
                 args += vec2.swizzle("xy")
                 i += 2
