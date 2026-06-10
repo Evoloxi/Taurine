@@ -5,7 +5,6 @@ import dev.engine_room.flywheel.api.layout.LayoutBuilder
 import dev.engine_room.flywheel.lib.instance.SimpleInstanceType
 import dev.engine_room.flywheel.lib.util.ExtraMemoryOps
 import io.taurine.Taurine
-import io.taurine.extension.toHalf
 import org.lwjgl.system.MemoryUtil
 
 object TaurineInstanceTypes {
@@ -24,9 +23,7 @@ object TaurineInstanceTypes {
             ExtraMemoryOps.put2x16(ptr + 0, instance.light)
             ExtraMemoryOps.putMatrix4f(ptr + 4, instance.pose)
             MemoryUtil.memPutFloat(ptr + 68, instance.anchorTime)
-            MemoryUtil.memPutShort(ptr + 72, instance.mx.toHalf())
-            MemoryUtil.memPutShort(ptr + 74, instance.my.toHalf())
-            MemoryUtil.memPutShort(ptr + 76, instance.mz.toHalf())
+            TaurineMemoryOps.memPutVector3f16(ptr + 72, instance.mx, instance.my, instance.mz)
         }
         .build()
 }
