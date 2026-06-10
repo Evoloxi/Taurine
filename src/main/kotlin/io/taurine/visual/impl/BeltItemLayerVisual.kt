@@ -275,12 +275,15 @@ class BeltItemLayerVisual(
     override fun beginFrame(ctx: DynamicVisual.Context) {
         if (!belt.isController || belt.speed == 0f) return
         shadows.resetCount()
-        if (mc.cameraEntity!!.distanceToSqr(pos.bottomCenter) >= 64) return
+
+        if (mc.cameraEntity!!.distanceToSqr(pos.bottomCenter) >= 32 * 32 + 24 * 24) {
+            shadows.discardExtra()
+            return
+        }
 
         val p = BeltParams.from(belt)
         for (transported in belt.inventory.transportedItems) {
             val offset = Mth.lerp(ctx.partialTick(),transported.prevBeltPosition, transported.beltPosition)
-            val sideOffset = Mth.lerp(ctx.partialTick(),transported.prevSideOffset, transported.sideOffset)
 
             val offsetVec = Vector3f(p.directionVec.x.toFloat(), 0f, p.directionVec.z.toFloat())
                 .mul(offset)
@@ -291,6 +294,12 @@ class BeltItemLayerVisual(
                 (visualPosition.z + offsetVec.z).toDouble()
             )
 
+            if (mc.cameraEntity!!.distanceToSqr(itemPos) >= 24 * 24) {
+                shadows.discardExtra()
+                return
+            }
+
+            val sideOffset = Mth.lerp(ctx.partialTick(),transported.prevSideOffset, transported.sideOffset)
             val adjustedSideOffset = if (p.alongX) +sideOffset else -sideOffset
 
             placeShadow(
