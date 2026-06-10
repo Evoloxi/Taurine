@@ -15,9 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.function.Function;
 
 @Mixin(InstanceAssemblerComponent.class)
@@ -25,12 +23,6 @@ public abstract class InstanceAssemblerComponentMixin {
     @Shadow
     @Final
     private static EnumMap<FloatRepr, Function<GlslExpr, GlslExpr>> FLOAT_UNPACKING_FUNCS;
-
-    @Shadow
-    protected abstract GlslExpr access(int uintOffset);
-
-    @Shadow
-    protected abstract GlslExpr unpackShortBackedScalar(int shortOffset, Function<GlslExpr, GlslExpr> unpackingFunc);
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void inject(CallbackInfo ci) {
@@ -56,21 +48,7 @@ public abstract class InstanceAssemblerComponentMixin {
             return original.call(instance, outType, size, byteOffset, byteSize, unpackingFunc);
         }
 
-        int shortOffset = byteOffset / Short.BYTES;
-        List<GlslExpr> args = new ArrayList<>();
-
-        int i = 0;
-        while (i < size) {
-            if (i + 1 < size && (shortOffset + i) % 2 == 0) {
-                int wordOffset = (shortOffset + i) / 2;
-                args.add(GlslExpr.call("unpackHalf2x16", access(wordOffset)).swizzle("xy"));
-                i += 2;
-            } else {
-                args.add(unpackShortBackedScalar(shortOffset + i, unpackingFunc));
-                i++;
-            }
-        }
-        return GlslExpr.call(outType, args);
+        return TaurineFloatRepr.unpackHalf2x16(instance, outType, size, byteOffset);
     }
 }
 
