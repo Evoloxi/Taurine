@@ -38,5 +38,16 @@ public class BeltRendererMixin {
     boolean filter(BeltRenderer instance, BeltBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer, int light, int overlay, Direction beltFacing, Vec3i directionVec, BeltSlope slope, int verticality, boolean slopeAlongX, boolean onContraption, TransportedItemStack transported, Vec3 beltStartOffset) {
         return !(VisualizationManager.supportsVisualization(be.getLevel()) && ModelCache.canBeInstanced(transported.stack));
     }
+
+    @WrapWithCondition(
+            method = "renderItem",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/simibubi/create/foundation/render/ShadowRenderHelper;renderShadow(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;FF)V"
+            )
+    )
+    boolean filter(PoseStack matrixStack, MultiBufferSource buffer, float opacity, float radius) {
+        return false;
+    }
 }
 
