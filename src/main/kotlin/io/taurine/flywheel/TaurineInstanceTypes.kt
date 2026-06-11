@@ -1,9 +1,12 @@
 package io.taurine.flywheel
 
+import dev.engine_room.flywheel.api.instance.InstanceType
 import dev.engine_room.flywheel.api.layout.FloatRepr
 import dev.engine_room.flywheel.api.layout.LayoutBuilder
+import dev.engine_room.flywheel.lib.instance.ShadowInstance
 import dev.engine_room.flywheel.lib.instance.SimpleInstanceType
 import dev.engine_room.flywheel.lib.util.ExtraMemoryOps
+import dev.engine_room.flywheel.lib.util.ResourceUtil
 import io.taurine.Taurine
 import org.lwjgl.system.MemoryUtil
 
@@ -16,7 +19,7 @@ object TaurineInstanceTypes {
                 .vector("light", FloatRepr.UNSIGNED_SHORT, 2)
                 .matrix("pose", FloatRepr.FLOAT, 4)
                 .scalar("anchorTime", FloatRepr.FLOAT)
-                .vector("motion", TaurineFloatRepr.HALF, 3)
+                .vector("motion", TaurineFloatRepr.HALF_FLOAT, 3)
                 .build()
         )
         .writer { ptr, instance ->

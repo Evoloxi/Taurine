@@ -43,7 +43,10 @@
     "create.accessor.DeployerBlockEntityAccessor",
     "create.filter_visual.LinkRendererMixin",
     "flywheel.FloatReprMixin",
+    "flywheel.GlNumericTypeMixin",
     "flywheel.InstanceAssemblerComponentMixin",
+    "flywheel.LayoutAttributesMixin",
+    "flywheel.SsboInstanceComponentMixin",
     "flywheel.accessor.InstanceAssemblerComponentAccessor",
     "vanillin.accesor.BlockEntityVisualizerBuilderAccessor"
   ]
