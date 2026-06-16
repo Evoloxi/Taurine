@@ -17,6 +17,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.runWhenOn
 object Taurine {
     const val ID = "taurine"
 
+    @JvmField
     val LOGGER: Logger = LogManager.getLogger(ID)
 
     init {

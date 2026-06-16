@@ -5,12 +5,13 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import dev.engine_room.flywheel.api.layout.*;
 import dev.engine_room.flywheel.backend.compile.LayoutInterpreter;
 import dev.engine_room.flywheel.backend.compile.component.InstanceAssemblerComponent;
 import dev.engine_room.flywheel.backend.glsl.generate.GlslBlock;
 import dev.engine_room.flywheel.backend.glsl.generate.GlslExpr;
-import io.taurine.flywheel.HalfFloatCompatible;
 import io.taurine.flywheel.TaurineFloatRepr;
 import io.taurine.flywheel.gl.TaurineGlslStmt;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Mixin(InstanceAssemblerComponent.class)
-public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
+public abstract class InstanceAssemblerComponentMixin {
 
     @Shadow
     @Final
@@ -43,19 +44,6 @@ public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
 
     @Unique
     private final Map<Integer, String> taurine$halfTemps = new HashMap<>();
-
-    @Unique
-    private @Nullable GlslBlock taurine$body;
-
-    @Override
-    public void setTaurine$body(@Nullable GlslBlock taurine$body) {
-        this.taurine$body = taurine$body;
-    }
-
-    @Override
-    public @Nullable GlslBlock getTaurine$body() {
-        return taurine$body;
-    }
 
     @Inject(
             method = "source",
@@ -80,11 +68,12 @@ public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
             ScalarElementType type,
             int byteOffset,
             CallbackInfoReturnable<GlslExpr> cir,
-            @Local(name = "repr") ValueRepr repr
+            @Local(name = "repr") ValueRepr repr,
+            @Share("taurine$fnBody") LocalRef<GlslBlock> fnBodyRef
     ) {
         if (repr == TaurineFloatRepr.HALF_FLOAT) {
             int shortOffset = byteOffset / Short.BYTES;
-            cir.setReturnValue(taurine$unpackHalfFloatScalar(shortOffset, taurine$body));
+            cir.setReturnValue(taurine$unpackHalfFloatScalar(shortOffset, fnBodyRef.get()));
         }
     }
 
@@ -100,11 +89,12 @@ public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
             int byteOffset,
             CallbackInfoReturnable<GlslExpr> cir,
             @Local(name = "repr") ValueRepr repr,
-            @Local(name = "size") int size
+            @Local(name = "size") int size,
+            @Share("taurine$fnBody") LocalRef<GlslBlock> fnBodyRef
             ) {
         if (repr == TaurineFloatRepr.HALF_FLOAT) {
             int shortOffset = byteOffset / Short.BYTES;
-            cir.setReturnValue(taurine$unpackHalfFloatVector(LayoutInterpreter.vectorTypeName(type), size, shortOffset, taurine$body));
+            cir.setReturnValue(taurine$unpackHalfFloatVector(LayoutInterpreter.vectorTypeName(type), size, shortOffset, fnBodyRef.get()));
         }
     }
 
@@ -121,20 +111,18 @@ public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
             int size, int byteOffset, int byteSize,
             Function<GlslExpr, GlslExpr> unpackingFunc,
             Operation<GlslExpr> original,
-            @Local(name = "repr") FloatRepr repr
+            @Local(name = "repr") FloatRepr repr,
+            @Share("taurine$fnBody") LocalRef<GlslBlock> fnBodyRef
     ) {
         if  (repr == TaurineFloatRepr.HALF_FLOAT) {
             int shortOffset = byteOffset / byteSize;
-            return taurine$unpackHalfFloatVector(outType, size, shortOffset, taurine$body);
+            return taurine$unpackHalfFloatVector(outType, size, shortOffset, fnBodyRef.get());
         } else {
             return original.call(instance, outType, size, byteOffset, byteSize, unpackingFunc);
         }
     }
 
-    /**
-     * @param body exists for ease of porting from non-mixin implementation
-     * */
-    @Override
+    @Unique
     public @NotNull GlslExpr taurine$unpackHalfFloatScalar(int shortOffset, @Nullable GlslBlock body) {
         int wordOffset = shortOffset / 2;
 
@@ -147,26 +135,26 @@ public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
         return vec2.swizzle(lane == 0 ? "x" : "y");
     }
 
-    @Override
+    @Unique
     public @NotNull GlslExpr taurine$halfTempForWord(int wordOffset, @Nullable GlslBlock body) {
         if (body != null) {
             String name = taurine$halfTemps.computeIfAbsent(wordOffset, k -> {
                 String tempName = "_flw_h" + k;
                 // vec2 _flw_h<k> = unpackHalf2x16(access(k));
-                body.add(TaurineGlslStmt.declare("vec2", tempName, access(k).callFunction("unpackHalf2x16")));
+                body.add(TaurineGlslStmt.declare("vec2", tempName, taurine$callUnpackHalf2x16(k)));
                 return tempName;
             });
             return GlslExpr.variable(name);
         }
 
-        return access(wordOffset).callFunction("unpackHalf2x16");
+        return taurine$callUnpackHalf2x16(wordOffset);
     }
 
-    @Override
+    @Unique
     public @NotNull GlslExpr taurine$unpackHalfFloatVector(@NotNull String outType, int size, int shortOffset, @Nullable GlslBlock body) {
         if (size == 2 && (shortOffset % 2 == 0) != BIG_ENDIAN) {
             int wordOffset = shortOffset / 2;
-            return access(wordOffset).callFunction("unpackHalf2x16");
+            return taurine$callUnpackHalf2x16(wordOffset);
         }
 
         List<GlslExpr> args = new ArrayList<>(size);
@@ -174,6 +162,11 @@ public class InstanceAssemblerComponentMixin implements HalfFloatCompatible {
             args.add(taurine$unpackHalfFloatScalar(shortOffset + i, body));
         }
         return GlslExpr.call(outType, args);
+    }
+
+    @Unique
+    private GlslExpr.FunctionCall taurine$callUnpackHalf2x16(int wordOffset) {
+        return access(wordOffset).callFunction("unpackHalf2x16");
     }
 }
 
